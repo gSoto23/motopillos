@@ -1,0 +1,335 @@
+.checkoutContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+  color: #fff;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(90deg, #fff, #a1a1aa);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.header p {
+  color: #a1a1aa;
+}
+
+.content {
+  display: flex;
+  justify-content: center;
+}
+
+.verificationCard, .successCard {
+  background: rgba(24, 24, 27, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 4rem;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  max-width: 600px;
+  width: 100%;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+.spinner {
+  animation: spin 1.5s linear infinite;
+  color: var(--accent-red);
+  margin-bottom: 1.5rem;
+}
+
+.successIcon {
+  color: #10b981;
+  margin-bottom: 1.5rem;
+}
+
+.errorIcon {
+  color: #ef4444;
+  margin-bottom: 1.5rem;
+}
+
+.verificationCard h2, .successCard h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.verificationCard p, .successCard p {
+  color: #a1a1aa;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.errorCard {
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.oosList {
+  text-align: left;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  list-style: none;
+}
+
+.oosList li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: #d1d5db;
+}
+
+.oosList li:last-child {
+  border-bottom: none;
+}
+
+.oosList strong {
+  color: #ef4444;
+}
+
+.primaryBtn {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s;
+}
+
+.primaryBtn:hover {
+  background: #2563eb;
+}
+
+.checkoutLayout {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 3rem;
+  width: 100%;
+}
+
+.formSection, .orderSummary {
+  background: rgba(24, 24, 27, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+}
+
+.formSection h2, .orderSummary h2 {
+  font-size: 1.25rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inputGroup label {
+  font-size: 0.875rem;
+  color: #a1a1aa;
+}
+
+.inputGroup input {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.875rem 1rem;
+  border-radius: 8px;
+  color: white;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.inputGroup input:focus {
+  border-color: #3b82f6;
+}
+
+.paymentMethods {
+  margin-top: 1rem;
+}
+
+.radioGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.radioLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+.paymentDisclaimer {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: rgba(225, 37, 27, 0.05);
+  border: 1px solid rgba(225, 37, 27, 0.2);
+  padding: 1.25rem;
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 1.5rem 0;
+}
+
+.submitBtn {
+  background: linear-gradient(135deg, var(--accent-red), #b91c1c);
+  color: #fff;
+  border: none;
+  padding: 1.25rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.submitBtn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.summaryItems {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.summaryItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.itemDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.itemName {
+  font-size: 0.875rem;
+  color: #fff;
+}
+
+.itemQty {
+  font-size: 0.75rem;
+  color: #a1a1aa;
+}
+
+.itemPrice {
+  font-weight: 600;
+}
+
+.totals {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  color: #a1a1aa;
+}
+
+.grandTotal {
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+@media (max-width: 1024px) {
+  .checkoutLayout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+/* Light Mode Overrides */
+:global([data-theme="light"]) .verificationCard, 
+:global([data-theme="light"]) .successCard,
+:global([data-theme="light"]) .formSection, 
+:global([data-theme="light"]) .orderSummary {
+  background: var(--bg-secondary);
+  border-color: var(--glass-border);
+}
+
+:global([data-theme="light"]) .summaryItem,
+:global([data-theme="light"]) .inputGroup input {
+  background: var(--bg-primary);
+  border-color: var(--glass-border);
+  color: var(--text-primary);
+}
+
+:global([data-theme="light"]) .header h1,
+:global([data-theme="light"]) .grandTotal,
+:global([data-theme="light"]) .itemName,
+:global([data-theme="light"]) .itemPrice {
+  color: var(--text-primary);
+  background: none;
+  -webkit-text-fill-color: initial;
+}
+
+:global([data-theme="light"]) .header p,
+:global([data-theme="light"]) .inputGroup label,
+:global([data-theme="light"]) .itemQty,
+:global([data-theme="light"]) .totalRow {
+  color: var(--text-secondary);
+}
+
+:global([data-theme="light"]) .checkoutContainer,
+:global([data-theme="light"]) .verificationCard h2,
+:global([data-theme="light"]) .successCard h2,
+:global([data-theme="light"]) .formSection h2,
+:global([data-theme="light"]) .orderSummary h2,
+:global([data-theme="light"]) .paymentMethods h3 {
+  color: var(--text-primary);
+}
+
+:global([data-theme="light"]) .verificationCard p,
+:global([data-theme="light"]) .successCard p,
+:global([data-theme="light"]) .inputGroup input::placeholder {
+  color: var(--text-muted);
+}
+
+:global([data-theme="light"]) .inputGroup input {
+  border: 1px solid #d1d5db;
+}

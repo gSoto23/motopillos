@@ -1,0 +1,138 @@
+.container {
+  min-height: 80vh;
+  padding: 4rem 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 3rem;
+  animation: fadeDown var(--transition-normal);
+}
+
+.backBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+  transition: color var(--transition-fast);
+}
+
+.backBtn:hover {
+  color: var(--accent-red);
+}
+
+.header h1 {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.header p {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.selectorCard {
+  padding: 3rem;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 3rem;
+  color: var(--text-muted);
+  font-family: var(--font-outfit);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.activeCrumb {
+  color: var(--accent-red);
+}
+
+.stepContainer {
+  flex: 1;
+}
+
+.gridFadeIn {
+  animation: fadeUp var(--transition-normal);
+}
+
+.stepHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.iconBackBtn {
+  position: absolute;
+  left: 0;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.iconBackBtn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.stepTitle {
+  text-align: center;
+  font-size: 1.8rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.selectionBtn {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 1.5rem;
+  font-size: 1.2rem;
+  font-family: var(--font-inter);
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+
+.selectionBtn:hover {
+  border-color: var(--accent-red);
+  background: rgba(225, 37, 27, 0.05);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

@@ -1,0 +1,58 @@
+{
+  "make": "Honda",
+  "category": "motorcycle",
+  "year": "2024",
+  "model": "CBR600RR",
+  "model_slug": "cbr600rr-6a-cbr600rr",
+  "components": [
+    {
+      "name": "Clutch",
+      "url": "https://www.partzilla.com/catalog/honda/motorcycle/2024/cbr600rr-6a-cbr600rr/clutch",
+      "diagram_url": "https://cdn.partzilla.com/cdn-cgi/image/quality=75,format=auto,fit=contain/MTE/d/e/MTc0OTQwOTk-ebdab095.png",
+      "hotspots": [
+        { "refNumber": "1", "percX": 85, "percY": 35 },
+        { "refNumber": "2", "percX": 60, "percY": 80 },
+        { "refNumber": "3", "percX": 88, "percY": 30 },
+        { "refNumber": "4", "percX": 80, "percY": 45 },
+        { "refNumber": "5", "percX": 65, "percY": 70 },
+        { "refNumber": "6", "percX": 45, "percY": 85 },
+        { "refNumber": "7", "percX": 35, "percY": 75 },
+        { "refNumber": "8", "percX": 40, "percY": 65 },
+        { "refNumber": "9", "percX": 55, "percY": 40 },
+        { "refNumber": "10", "percX": 50, "percY": 35 },
+        { "refNumber": "11", "percX": 15, "percY": 58 },
+        { "refNumber": "12", "percX": 12, "percY": 68 },
+        { "refNumber": "13", "percX": 45, "percY": 80 },
+        { "refNumber": "14", "percX": 35, "percY": 50 },
+        { "refNumber": "15", "percX": 10, "percY": 75 },
+        { "refNumber": "16", "percX": 32, "percY": 85 },
+        { "refNumber": "17", "percX": 40, "percY": 75 },
+        { "refNumber": "18", "percX": 43, "percY": 70 },
+        { "refNumber": "19", "percX": 73, "percY": 52 },
+        { "refNumber": "20", "percX": 22, "percY": 52 },
+        { "refNumber": "21", "percX": 73, "percY": 40 }
+      ],
+      "parts_list": [
+        { "raw_text": "1\t\nSPROCKET\n15131-MAL-A01\nIn Stock\n\t\n$55.26\n$61.29\n\t\nADD" },
+        { "raw_text": "2\t\nCLUTCH OUTER\n22100-MFJ-D00\nIn Stock\n\t\n$357.38\n$396.37\n\t\nADD" },
+        { "raw_text": "3\t\nCOLLAR, OIL PUMP SPROCKET\n22116-MJC-D00\nShips in 1 to 2 days\n\t\n$21.00\n$23.29\n\t\nADD" },
+        { "raw_text": "4\t\nGUIDE\n22118-MEE-000\nIn Stock\n\t\n$16.39\n$18.18\n\t\nADD" },
+        { "raw_text": "5\t\nCLUTCH CENTER\n22120-MEE-000\nIn Stock\n\t\n$85.93\n$108.84\n\t\nADD" },
+        { "raw_text": "6\t\nJUDDER SPRING SEAT\n22125-ML7-000\nIn Stock\n\t\n$9.91\n$12.55\n\t\nADD" },
+        { "raw_text": "7\t\nCLUTCH FRICTION DISK\n22201-MAE-000\nIn Stock\n\t\n$18.80\n$20.85\n\t\nADD" },
+        { "raw_text": "8\t\nCLUTCH FRICTION DISK\n22201-MFJ-D00\nIn Stock\n\t\n$13.93\n$15.45\n\t\nADD" },
+        { "raw_text": "9\t\nCLUTCH FRICTION DISK\n22202-MAE-000\nIn Stock\n\t\n$14.55\n$18.64\n\t\nADD" },
+        { "raw_text": "10\t\nCLUTCH PLATE\n22321-MAS-000\nIn Stock\n\t\n$16.52\n$18.33\n\t\nADD" },
+        { "raw_text": "11\t\nCLUTCH PRESSURE PLATE\n22350-MCJ-000\nIn Stock\n\t\n$59.72\n$75.65\n\t\nADD" },
+        { "raw_text": "12\t\nCLUTCH SPRING\n22401-MBG-D00\nIn Stock\n\t\n$3.96\n$4.98\n\t\nADD" },
+        { "raw_text": "13\t\nJUDDER SPRING\n22402-MAS-E00\nIn Stock\n\t\n$19.52\n$24.73\n\t\nADD" },
+        { "raw_text": "14\t\nCLUTCH LIFTER PIN\n22847-MFJ-D00\nIn Stock\n\t\n$14.87\n$18.84\n\t\nADD" },
+        { "raw_text": "15\t\nWASHER BOLT\n90024-MAS-000\nIn Stock\n\t\n$3.62\n$4.56\n\t\nADD" },
+        { "raw_text": "16\t\nLOCK NUT\n90231-MM5-000\nIn Stock\n\t\n$9.49\n$12.29\n\t\nADD" },
+        { "raw_text": "17\t\nWASHER\n90432-MM5-000\nIn Stock\n\t\n$7.98\n$10.02\n\t\nADD" },
+        { "raw_text": "18\t\nWASHER\n90451-KG4-000\nIn Stock\n\t\n$4.47\n$5.72\n\t\nADD" },
+        { "raw_text": "19\t\nWASHER\n90459-MM4-000\nIn Stock\n\t\n$9.96\n$12.62\n\t\nADD" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "make": "Honda",
+  "category": "motorcycle",
+  "year": "2024",
+  "model": "CBR600RR",
+  "model_slug": "cbr600rr",
+  "components": [
+    {
+      "name": "Clutch",
+      "url": "https://www.partzilla.com/catalog/honda/motorcycle/2024/cbr600rr/clutch",
+      "diagram_url": "https://cdn.partzilla.com/cdn-cgi/image/quality=75,format=auto,fit=contain/MTE/d/e/MTc0OTQwOTk-ebdab095.png",
+      "hotspots": [
+        { "refNumber": "1", "percX": 20, "percY": 40 },
+        { "refNumber": "2", "percX": 25, "percY": 65 },
+        { "refNumber": "3", "percX": 65, "percY": 25 },
+        { "refNumber": "4", "percX": 80, "percY": 35 },
+        { "refNumber": "5", "percX": 70, "percY": 68 },
+        { "refNumber": "6", "percX": 30, "percY": 35 },
+        { "refNumber": "7", "percX": 60, "percY": 55 },
+        { "refNumber": "8", "percX": 35, "percY": 60 },
+        { "refNumber": "9", "percX": 75, "percY": 28 },
+        { "refNumber": "10", "percX": 60, "percY": 15 },
+        { "refNumber": "11", "percX": 15, "percY": 58 },
+        { "refNumber": "12", "percX": 12, "percY": 68 },
+        { "refNumber": "13", "percX": 45, "percY": 80 },
+        { "refNumber": "14", "percX": 35, "percY": 50 },
+        { "refNumber": "15", "percX": 10, "percY": 75 },
+        { "refNumber": "16", "percX": 32, "percY": 85 },
+        { "refNumber": "17", "percX": 40, "percY": 75 },
+        { "refNumber": "18", "percX": 43, "percY": 70 },
+        { "refNumber": "19", "percX": 73, "percY": 52 },
+        { "refNumber": "20", "percX": 22, "percY": 52 },
+        { "refNumber": "21", "percX": 73, "percY": 40 }
+      ],
+      "parts_list": [
+        { "raw_text": "1\t\nOUTER COMP., CLUTCH\n22100-MFJ-D00\nShips in 1 to 2 days\n\t\n$259.00\n$285.00\n\t\nADD" },
+        { "raw_text": "2\t\nCENTER, CLUTCH\n22120-MFJ-D00\nIn Stock\n\t\n$55.00\n$65.00\n\t\nADD" },
+        { "raw_text": "3\t\nDISK, CLUTCH FRICTION\n22201-MAE-000\nIn Stock\n\t\n$12.50\n$14.00\n\t\nADD" },
+        { "raw_text": "4\t\nPLATE A, CLUTCH\n22321-MEL-000\nShips in 1 to 2 days\n\t\n$8.90\n$9.50\n\t\nADD" },
+        { "raw_text": "5\t\nSPRING, CLUTCH\n22401-MFJ-D00\nIn Stock\n\t\n$4.50\n$5.00\n\t\nADD" },
+        { "raw_text": "6\t\nLIFTER, CLUTCH\n22847-MFJ-D00\nIn Stock\n\t\n$35.00\n$39.00\n\t\nADD" },
+        { "raw_text": "7\t\nROD, CLUTCH LIFTER\n22851-MFJ-D00\nShips in 1 to 2 days\n\t\n$15.00\n$17.00\n\t\nADD" },
+        { "raw_text": "8\t\nWASHER, THRUST (22X36X1.5)\n90401-MFJ-D00\nIn Stock\n\t\n$6.00\n$7.00\n\t\nADD" },
+        { "raw_text": "9\t\nNUT, CLUTCH CENTER (22MM)\n90231-MFJ-D00\nShips in 1 to 2 days\n\t\n$5.50\n$6.00\n\t\nADD" },
+        { "raw_text": "10\t\nBEARING, RADIAL BALL (16003)\n91008-KK6-000\nIn Stock\n\t\n$9.00\n$11.00\n\t\nADD" },
+        { "raw_text": "11\t\nSPRING, JUDDER\n22402-MJM-D00\nIn Stock\n\t\n$8.00\n$9.50\n\t\nADD" },
+        { "raw_text": "12\t\nSEAT, JUDDER SPRING\n22403-MJM-D00\nShips in 1 to 2 days\n\t\n$6.50\n$7.50\n\t\nADD" },
+        { "raw_text": "13\t\nPIECE, CLUTCH LIFTER\n22852-MJM-D00\nIn Stock\n\t\n$4.20\n$5.00\n\t\nADD" },
+        { "raw_text": "14\t\nBOLT, FLANGE\n90011-MJM-D00\nIn Stock\n\t\n$2.10\n$2.50\n\t\nADD" },
+        { "raw_text": "15\t\nWASHER, SPLINE\n90401-MJM-D00\nShips in 1 to 2 days\n\t\n$4.50\n$5.00\n\t\nADD" },
+        { "raw_text": "16\t\nNUT, LOCK\n90231-MJM-D00\nIn Stock\n\t\n$6.00\n$6.50\n\t\nADD" },
+        { "raw_text": "17\t\nWASHER\n90432-MM5-000\nIn Stock\n\t\n$10.02\n$11.50\n\t\nADD" },
+        { "raw_text": "18\t\nWASHER\n90451-KG4-000\nIn Stock\n\t\n$5.72\n$6.50\n\t\nADD" },
+        { "raw_text": "19\t\nWASHER\n90459-MM4-000\nIn Stock\n\t\n$12.62\n$14.00\n\t\nADD" },
+        { "raw_text": "20\t\nBEARING\n91009-MAS-003\nIn Stock\n\t\n$28.70\n$32.00\n\t\nADD" },
+        { "raw_text": "21\t\nBEARING\n91102-MEE-003\nIn Stock\n\t\n$7.99\n$9.00\n\t\nADD" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  slug      String   @unique // e.g. "sport-bike"
+  name      String   // e.g. "Moto Deportiva"
+  makes     Make[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Make {
+  id         String   @id @default(uuid())
+  slug       String   @unique // e.g. "honda"
+  name       String   // e.g. "Honda"
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+  years      ModelYear[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model ModelYear {
+  id        String   @id @default(uuid())
+  year      Int      // e.g. 2023
+  makeId    String
+  make      Make     @relation(fields: [makeId], references: [id])
+  models    VehicleModel[]
+  
+  @@unique([year, makeId])
+}
+
+model VehicleModel {
+  id         String     @id @default(uuid())
+  slug       String     // e.g. "cbr600rr"
+  name       String     // e.g. "CBR600RR"
+  yearId     String
+  year       ModelYear  @relation(fields: [yearId], references: [id])
+  assemblies ComponentAssembly[]
+
+  @@unique([slug, yearId])
+}
+
+model ComponentAssembly {
+  id          String   @id @default(uuid())
+  slug        String   // e.g. "air-cleaner"
+  name        String   // e.g. "Filtro de Aire"
+  diagramUrl  String?  // AWS S3 URL
+  modelId     String
+  model       VehicleModel @relation(fields: [modelId], references: [id])
+  parts       Part[]
+
+  @@unique([slug, modelId])
+}
+
+model Part {
+  id             String   @id @default(uuid())
+  refNumber      String   // e.g. "001"
+  partNumber     String   // e.g. "17210-MFJ-D00"
+  name           String   // e.g. "CASE SUB ASSY., AIR CLEANER"
+  basePriceMSRP  Float
+  basePriceSale  Float
+  stockStatus    String   // e.g. "En Stock", "Agotado"
+  hotspotX       Float?   // Percentage 0-100 left
+  hotspotY       Float?   // Percentage 0-100 top
+  assemblyId     String
+  assembly       ComponentAssembly @relation(fields: [assemblyId], references: [id])
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model AppConfiguration {
+  id                  String   @id @default(uuid())
+  key                 String   @unique // e.g. "GLOBAL_MARGIN"
+  marginMultiplier    Float    @default(1.0) // e.g. 1.25 for +25%
+  baseShippingCost    Float    @default(0.0) // Flat cost added to cart
+  sinpePhone          String?
+  sinpeName           String?
+  transferAccount     String?
+  transferName        String?
+  lastUpdated         DateTime @updatedAt
+}
+
+model Order {
+  id              String   @id @default(uuid())
+  customerName    String
+  customerEmail   String
+  customerPhone   String
+  shippingAddress String
+  totalAmount     Float
+  paymentMethod   String   // "TARJETA", "SINPE", "TRANSFERENCIA"
+  status          String   @default("PENDING") // "PENDING", "APPROVED", "SHIPPED", "CANCELLED"
+  itemsList       String   // JSON stringified array of items
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
