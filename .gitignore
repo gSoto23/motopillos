@@ -69,3 +69,13 @@ test-results/
 .vscode/
 .idea/
 .cursorrules
+
+# Scraping Output
+/datos_extraidos/
+abs-control-unit-cbr600ra.json
+scraper_*.log
+# Cloud Images Cache
+/lightsail_images/
+
+# SQLite Mass Data
+/*.db
