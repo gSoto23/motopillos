@@ -1,25 +1,29 @@
 .adminContainer {
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
   background: var(--bg-primary);
   color: var(--text-primary);
 }
-
 .sidebar {
-  width: 280px;
+  width: 100%;
   background: var(--bg-secondary);
-  border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
   display: flex;
-  flex-direction: column;
-  padding: 2rem 1.5rem;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 4rem;
   flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .brand {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 3rem;
 }
 
 .brand h2 {
@@ -39,24 +43,23 @@
 
 .navLinks {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  flex: 1;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.5rem;
 }
 
 .navBtn, .activeLink {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem;
+  gap: 0.6rem;
+  padding: 0.75rem 1.2rem;
   background: transparent;
   border: none;
   color: var(--text-secondary);
   font-family: var(--font-inter);
-  font-size: 1rem;
+  font-size: 0.95rem;
   cursor: pointer;
   border-radius: 8px;
-  text-align: left;
   transition: all var(--transition-fast);
 }
 
@@ -69,13 +72,13 @@
   background: rgba(225, 37, 27, 0.1);
   color: var(--accent-red);
   font-weight: 600;
-  border-right: 3px solid var(--accent-red);
+  border-bottom: 2px solid var(--accent-red);
+  border-radius: 8px 8px 0 0;
 }
 
 .sidebarBottom {
-  margin-top: auto;
-  padding-top: 2rem;
-  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
 }
 
 .backBtn {
@@ -113,16 +116,27 @@
 
 .dashboardGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
-  max-width: 1000px;
+  width: 100%;
 }
 
 .configCard {
-  padding: 2rem;
+  padding: 2.5rem;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+}
+
+.configCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+  border-color: var(--border-focus);
 }
 
 .cardHeader {
@@ -156,11 +170,11 @@
 }
 
 .inputGroup label {
-  font-weight: 500;
-  color: var(--text-muted);
-  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.85rem;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
 }
 
 .inputWrapper {
@@ -174,12 +188,14 @@
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
-  padding: 1rem;
+  padding: 1rem 1.25rem;
   font-size: 1.2rem;
+  font-weight: 600;
   border-radius: 8px;
   width: 120px;
   font-family: var(--font-inter);
-  transition: border-color var(--transition-fast);
+  transition: all 0.2s ease;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
 .numInput:focus {
@@ -192,11 +208,13 @@
   border: 1px solid var(--border-color);
   color: var(--text-primary);
   padding: 1rem 1rem 1rem 2.5rem;
-  font-size: 1.2rem;
+  font-size: 1.15rem;
+  font-weight: 600;
   border-radius: 8px;
   width: 140px;
   font-family: var(--font-inter);
-  transition: border-color var(--transition-fast);
+  transition: all 0.2s ease;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
 .numInputWithPrefix:focus {
@@ -207,8 +225,9 @@
 .currencyPrefix {
   position: absolute;
   left: 1rem;
-  color: var(--text-secondary);
-  font-size: 1.2rem;
+  color: var(--text-muted);
+  font-size: 1.15rem;
+  font-weight: 600;
   pointer-events: none;
 }
 
@@ -382,5 +401,33 @@
   background: var(--accent-red);
   border-color: var(--accent-red);
   color: white;
+}
+
+/* Toaster Notification */
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  background: #10b981;
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  z-index: 9999;
+  transform: translateY(100px);
+  opacity: 0;
+  animation: slideUp 0.3s forwards ease-out;
+}
+
+.toastError {
+  background: #ef4444;
+}
+
+@keyframes slideUp {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 

@@ -21,8 +21,6 @@ export default async function OrdersDashboard() {
         <nav className={styles.navLinks}>
           <Link href="/admin" className={styles.navBtn}><Settings size={20}/> Configuración</Link>
           <Link href="/admin/orders" className={styles.activeLink}><Package size={20}/> Órdenes</Link>
-          <button className={styles.navBtn}><Activity size={20}/> Bot Scraper (Python)</button>
-          <button className={styles.navBtn}><Database size={20}/> Catálogo DB</button>
         </nav>
         
         <div className={styles.sidebarBottom}>

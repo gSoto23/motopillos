@@ -15,6 +15,12 @@ export default function AdminDashboard() {
   const [transferName, setTransferName] = useState('Motopillos S.A.');
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [toast, setToast] = useState({ show: false, message: '', type: '' });
+
+  const showToast = (message, type = 'success') => {
+    setToast({ show: true, message, type });
+    setTimeout(() => setToast({ show: false, message: '', type: '' }), 3000);
+  };
 
   useEffect(() => {
     async function loadData() {
@@ -37,9 +43,9 @@ export default function AdminDashboard() {
     setIsSaving(false);
     
     if (result.success) {
-      alert('Configuraciones guardadas exitosamente en la Base de Datos SQLite.');
+      showToast('Configuraciones guardadas exitosamente en la Base de Datos PostgreSQL.');
     } else {
-      alert('Error: ' + result.error);
+      showToast('Error: ' + result.error, 'error');
     }
   };
 
@@ -54,8 +60,6 @@ export default function AdminDashboard() {
         <nav className={styles.navLinks}>
           <Link href="/admin" className={styles.activeLink}><Settings size={20}/> Configuración</Link>
           <Link href="/admin/orders" className={styles.navBtn}><Package size={20}/> Órdenes</Link>
-          <button className={styles.navBtn}><Activity size={20}/> Bot Scraper (Python)</button>
-          <button className={styles.navBtn}><Database size={20}/> Catálogo DB</button>
         </nav>
         
         <div className={styles.sidebarBottom}>
@@ -228,6 +232,13 @@ export default function AdminDashboard() {
         </div>
         )}
       </main>
+
+      {/* Floating Toast Notification */}
+      {toast.show && (
+        <div className={`${styles.toast} ${toast.type === 'error' ? styles.toastError : ''}`}>
+          {toast.message}
+        </div>
+      )}
     </div>
   );
 }

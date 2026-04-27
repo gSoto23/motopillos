@@ -8,11 +8,20 @@ export default function PartItemCard({ part, finalPriceUSD, finalPriceCRC, vehic
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
 
-  const increment = () => setQuantity(prev => prev + 1);
-  const decrement = () => setQuantity(prev => (prev > 1 ? prev - 1 : 1));
+  const isAvailable = finalPriceUSD > 0;
+
+  const increment = () => setQuantity(prev => {
+    if (!isAvailable) return prev;
+    return prev + 1;
+  });
+  const decrement = () => setQuantity(prev => {
+    if (!isAvailable) return prev;
+    return prev > 1 ? prev - 1 : 1;
+  });
 
   // Agregar al Cart Context real
   const handleAddToCart = () => {
+    if (!isAvailable) return;
     addToCart({
       partNo: part.sku,
       name: part.name,
@@ -65,12 +74,20 @@ export default function PartItemCard({ part, finalPriceUSD, finalPriceCRC, vehic
         
         {/* Precios Fijos o Totales basados en cantidad */}
         <div style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.2' }}>
-          <strong style={{ color: 'var(--price-color)', fontSize: '1.25rem' }}>
-            ${(finalPriceUSD * quantity).toFixed(2)}
-          </strong>
-          <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-            ¢{Math.round(finalPriceCRC * quantity).toLocaleString('es-CR')}
-          </span>
+          {isAvailable ? (
+            <>
+              <strong style={{ color: 'var(--price-color)', fontSize: '1.25rem' }}>
+                ${(finalPriceUSD * quantity).toFixed(2)}
+              </strong>
+              <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                ¢{Math.round(finalPriceCRC * quantity).toLocaleString('es-CR')}
+              </span>
+            </>
+          ) : (
+            <strong style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginTop: '0.2rem' }}>
+              No Disponible
+            </strong>
+          )}
         </div>
 
         {/* Acciones: Selector y Botón */}
@@ -87,16 +104,18 @@ export default function PartItemCard({ part, finalPriceUSD, finalPriceCRC, vehic
           }}>
             <button 
               onClick={decrement}
-              style={{ background: 'none', border: 'none', padding: '0.5rem', color: 'var(--text-primary)', cursor: quantity > 1 ? 'pointer' : 'not-allowed', opacity: quantity > 1 ? 1 : 0.5 }}
+              disabled={!isAvailable}
+              style={{ background: 'none', border: 'none', padding: '0.5rem', color: isAvailable ? 'var(--text-primary)' : 'var(--text-muted)', cursor: isAvailable && quantity > 1 ? 'pointer' : 'not-allowed', opacity: isAvailable && quantity > 1 ? 1 : 0.5 }}
             >
               <Minus size={16} />
             </button>
-            <span style={{ width: '2rem', textAlign: 'center', fontWeight: 'bold', fontSize: '1rem' }}>
+            <span style={{ width: '2rem', textAlign: 'center', fontWeight: 'bold', fontSize: '1rem', color: isAvailable ? 'var(--text-primary)' : 'var(--text-muted)' }}>
               {quantity}
             </span>
             <button 
               onClick={increment}
-              style={{ background: 'none', border: 'none', padding: '0.5rem', color: 'var(--text-primary)', cursor: 'pointer' }}
+              disabled={!isAvailable}
+              style={{ background: 'none', border: 'none', padding: '0.5rem', color: isAvailable ? 'var(--text-primary)' : 'var(--text-muted)', cursor: isAvailable ? 'pointer' : 'not-allowed', opacity: isAvailable ? 1 : 0.5 }}
             >
               <Plus size={16} />
             </button>
@@ -105,16 +124,17 @@ export default function PartItemCard({ part, finalPriceUSD, finalPriceCRC, vehic
           {/* Botón Añadir */}
           <button 
             onClick={handleAddToCart}
+            disabled={!isAvailable}
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '0.4rem',
-              backgroundColor: 'var(--accent-red)',
-              color: 'white',
-              border: 'none',
+              backgroundColor: isAvailable ? 'var(--accent-red)' : 'var(--bg-tertiary)',
+              color: isAvailable ? 'white' : 'var(--text-muted)',
+              border: isAvailable ? 'none' : '1px solid var(--border-color)',
               padding: '0 1rem',
               borderRadius: '6px',
-              cursor: 'pointer',
+              cursor: isAvailable ? 'pointer' : 'not-allowed',
               fontSize: '0.9rem',
               fontWeight: 'bold',
               transition: 'background-color 0.2s',
