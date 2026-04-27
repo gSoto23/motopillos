@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Motopillos E-Commerce Platform 🏍️🔥
 
-## Getting Started
+Motopillos es una plataforma web de alto rendimiento orientada a la localización e importación de repuestos genuinos (OEM) de las principales marcas mundiales de motocicletas. La arquitectura está diseñada para sostener millones de registros tabulares y facilitar búsquedas instantáneas de diagramas explosivos.
 
-First, run the development server:
+## 🏗️ Pila Tecnológica (Next Generation)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Esta aplicación fue migrada enteramente hacia una infraestructura de grado corporativo:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Frontend / Backend-End (SSR)**: Next.js 16.2.0 (App Router + Turbopack).
+- **Base de Datos Principal**: PostgreSQL 18.3 en Amazon Web Services (AWS RDS / Lightsail).
+- **Motor ORM**: Prisma Client (`provider = "postgresql"`).
+- **Almacenamiento Multimedia**: Amazon S3 (`bucket-motopillos`) - Hospedaje de más de 290,000 imágenes de diagramas técnicos con endpoints públicos CDN.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## 📊 Dimensiones de Datos Activos
+La base de datos en estado de producción alberga un ecosistema colosal e interconectado:
+- **5,011** Vehículos únicos indexados.
+- **202,190** Repuestos (SKUs únicos) registrados.
+- **295,384** Categorías/Diagramas técnicos aislados.
+- **6,586,025** Nodos de pivote: Conexiones transaccionales absolutas (`category_products`) que entrelazan los modelos, diagramas y referencias universales.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Flujo de Operación de Extracción (Scrapers)
+El repositorio conserva en su formato original la carpeta `/scraper/` utilizada originariamente para la ingesta Big Data desde proveedores norteamericanos. Actualmente operan en Python puro bajo arquitecturas de SQLite persistente y concurrencia. No interfiere con el servidor Next.js y funge de código fuente para futuras re-indexaciones de catálogo.
 
-## Learn More
+## 🛍️ Roadmap: Facturación y Checkout (Fase E2E)
+Para las futuras iteraciones de equipo de desarrollo, el embudo E2E comercial está diseñado de la siguiente manera:
 
-To learn more about Next.js, take a look at the following resources:
+1. **Cart Context API**: Opera persitentemente en `localStorage` transformando dólares a colones en tiempo real mediante el multiplicador centralizado de la Base de Datos (`AdminConfig`).
+2. **Checkout (Logística)**: Proceso final para confirmar las direcciones de recolección (Mensajería o Recolección).
+3. **Módulo Transaccional Principal**: Integrado vía **Tilopay** Gateway.
+4. **Validación Automática**: Emisión paralela de recibos por correo electrónico transaccional y derivación al WhatsApp de importación para consolidación del pago o verificaciones de pedido.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🚀 Despliegue (Production Next.js)
+Dado el peso de los diagramas, los mismos residen puramente en Amazon S3. 
+Para ejecutar un clon local asegurate siempre de tener disponible en tu `.env` las llaves del `DATABASE_URL` y las credenciales del `S3_BUCKET_NAME`. Un simple `npx prisma generate && npm run dev` encenderá el motor web.
