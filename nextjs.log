@@ -1,0 +1,15 @@
+
+> motopillos@0.1.0 dev
+> next dev
+
+▲ Next.js 16.2.0 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.1.157:3000
+- Environments: .env
+✓ Ready in 303ms
+
+ GET / 200 in 515ms (next.js: 269ms, application-code: 246ms)
+ GET / 200 in 108ms (next.js: 18ms, application-code: 90ms)
+ GET /catalog/dirt-bike 200 in 580ms (next.js: 559ms, application-code: 20ms)
+ GET /catalog/dirt-bike 200 in 50ms (next.js: 15ms, application-code: 35ms)
+ GET / 200 in 39ms (next.js: 11ms, application-code: 29ms)

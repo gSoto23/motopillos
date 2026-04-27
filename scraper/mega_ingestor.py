@@ -3,6 +3,14 @@ import json
 import sqlite3
 import time
 from glob import glob
+from dotenv import load_dotenv
+
+env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env')
+load_dotenv(env_path)
+
+S3_PUBLIC_ENDPOINT = os.getenv('S3_PUBLIC_ENDPOINT', '')
+if S3_PUBLIC_ENDPOINT:
+    S3_PUBLIC_ENDPOINT = S3_PUBLIC_ENDPOINT.rstrip('/')
 
 DB_PATH = '/Users/gsoto/Desktop/motopillos/motopillos_catalog.db'
 BASE_DIR = '/Users/gsoto/Desktop/motopillos/datos_extraidos'
@@ -116,9 +124,15 @@ def main():
         
         # Resolver nombre bonito de categoría. A veces no lo tenemos, usamos el slug capitalizado
         cat_name = cat_slug.replace('-', ' ').upper()
-        diagram_img = os.path.join(os.path.dirname(file_path), f"diagrama_{cat_slug}.png")
-        if not os.path.exists(diagram_img):
-            diagram_img = None
+        
+        # En la migración cloud, las imágenes se estructuraron subcarpetas idénticas al origen
+        # armamos la ruta relativa y la unimos al endpoint
+        cloud_relative_path = os.path.join(brand_str, parts[1], year_str, model_slug, f"diagrama_{cat_slug}.png")
+        
+        if S3_PUBLIC_ENDPOINT:
+            diagram_img = f"{S3_PUBLIC_ENDPOINT}/{cloud_relative_path}"
+        else:
+            diagram_img = cloud_relative_path
             
         orig_url = data.get("diagrama_url", "")
             
