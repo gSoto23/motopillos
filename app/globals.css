@@ -11,6 +11,8 @@
   --accent-red: #E1251B; 
   --accent-red-hover: #ff3333;
   --accent-blue: #00A3FF;
+  --brand-blue: #19232F;
+  --price-color: var(--brand-blue);
   
   /* Borders */
   --border-color: #e4e4e7;
@@ -42,6 +44,8 @@
   --accent-red: #E1251B; 
   --accent-red-hover: #ff3333;
   --accent-blue: #00A3FF;
+  --brand-blue: #19232F;
+  --price-color: var(--accent-red);
   
   /* Borders */
   --border-color: #2a2a2a;

@@ -1,0 +1,107 @@
+.gridContainer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  gap: 2rem;
+}
+
+.diagramSide {
+  background-color: var(--bg-secondary);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.partsSide {
+  background-color: var(--bg-tertiary);
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
+  padding: 1rem;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+/* Part Item styles to ensure mobile text wrapping */
+.partItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--bg-primary);
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.25rem;
+}
+
+.partInfo {
+  flex: 1;
+  min-width: 0; /* allows text to truncate or wrap properly */
+  margin-right: 1rem;
+}
+
+.partName {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  display: block;
+}
+
+.cardBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px dashed var(--border-color);
+}
+
+.cardActions {
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+/* Mobile Breakpoint */
+@media (max-width: 900px) {
+  .gridContainer {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .partsSide {
+    max-height: none; /* Let it flow naturally on mobile */
+    overflow-y: visible;
+  }
+  
+  .partItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .partInfo {
+    margin-right: 0;
+    width: 100%;
+  }
+  
+  .partAction {
+    width: 100%;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .cardBottom {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .cardActions {
+    justify-content: space-between;
+    width: 100%;
+  }
+}

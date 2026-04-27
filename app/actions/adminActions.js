@@ -15,6 +15,7 @@ export async function getAdminConfig() {
           key: 'GLOBAL_CONFIG',
           marginMultiplier: 1.25,
           baseShippingCost: 15.00,
+          exchangeRate: 515.0,
           sinpePhone: '8888-8888',
           sinpeName: 'Motopillos',
           transferAccount: 'CR12015201001234567890',
@@ -29,13 +30,14 @@ export async function getAdminConfig() {
   }
 }
 
-export async function saveAdminConfig(marginMultiplier, baseShippingCost, sinpePhone, sinpeName, transferAccount, transferName) {
+export async function saveAdminConfig(marginMultiplier, baseShippingCost, exchangeRate, sinpePhone, sinpeName, transferAccount, transferName) {
   try {
     await prisma.appConfiguration.upsert({
       where: { key: 'GLOBAL_CONFIG' },
       update: {
         marginMultiplier,
         baseShippingCost,
+        exchangeRate,
         sinpePhone,
         sinpeName,
         transferAccount,
@@ -45,6 +47,7 @@ export async function saveAdminConfig(marginMultiplier, baseShippingCost, sinpeP
         key: 'GLOBAL_CONFIG',
         marginMultiplier,
         baseShippingCost,
+        exchangeRate,
         sinpePhone,
         sinpeName,
         transferAccount,

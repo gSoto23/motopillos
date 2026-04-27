@@ -3,10 +3,10 @@
   top: 0;
   z-index: 100;
   width: 100%;
-  background: rgba(10, 10, 10, 0.85);
+  background: var(--brand-blue);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding: 1rem 0;
 }
 
@@ -48,18 +48,73 @@
 .searchIcon {
   position: absolute;
   left: 1rem;
-  color: var(--text-muted);
+  color: #666;
 }
 
 .searchInput {
   width: 100%;
   padding: 0.8rem 1rem 0.8rem 3rem;
   border-radius: 8px;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
+  background: white;
+  border: 1px solid rgba(255,255,255,0.2);
+  color: black;
   font-family: var(--font-inter);
   transition: all var(--transition-fast);
+}
+
+.searchResults {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-top: 0.5rem;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+}
+
+.searchResultItem {
+  padding: 0.8rem 1rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s;
+}
+
+.searchResultItem:last-child {
+  border-bottom: none;
+}
+
+.searchResultItem:hover, .searchResultItem:focus {
+  background-color: var(--bg-secondary);
+  outline: none;
+}
+
+.itemBrand {
+  font-size: 0.75rem;
+  color: var(--accent-red);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.itemTitle {
+  font-size: 0.95rem;
+  font-weight: bold;
+}
+
+.noResults {
+  padding: 1rem;
+  color: var(--text-muted);
+  text-align: center;
+  font-size: 0.9rem;
 }
 
 .cartBtn:hover {
@@ -71,8 +126,8 @@
   position: absolute;
   top: 4px;
   right: 4px;
-  background: var(--accent-red);
-  color: white;
+  background: white;
+  color: var(--accent-red);
   font-size: 0.7rem;
   font-weight: 800;
   width: 18px;
@@ -99,7 +154,7 @@
   position: relative;
   background: transparent;
   border: none;
-  color: var(--text-secondary);
+  color: white;
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 50%;
@@ -110,8 +165,8 @@
 }
 
 .iconBtn:hover {
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
 }
 
 @media (max-width: 768px) {

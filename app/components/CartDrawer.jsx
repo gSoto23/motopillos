@@ -5,7 +5,7 @@ import { X, ShoppingCart, Trash2, Cpu, ArrowRight } from 'lucide-react';
 import styles from './CartDrawer.module.css';
 
 export default function CartDrawer() {
-  const { items, isOpen, setIsOpen, removeFromCart, updateQty, subtotal, isLoaded } = useCart();
+  const { items, isOpen, setIsOpen, removeFromCart, updateQty, subtotal, subtotalCRC, isLoaded } = useCart();
   const router = useRouter();
 
   if (!isLoaded) return null; // Wait for hydration
@@ -46,7 +46,14 @@ export default function CartDrawer() {
                 </div>
                 
                 <h4 className={styles.itemName}>{item.name}</h4>
-                <span className={styles.itemPartNo}>OEM: {item.partNo}</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem', marginBottom: '1rem' }}>
+                  <span className={styles.itemPartNo}>OEM: {item.partNo}</span>
+                  {item.meta && (
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                      {item.meta}
+                    </span>
+                  )}
+                </div>
                 
                 <div className={styles.itemFooter}>
                   <div className={styles.qtyControl}>
@@ -54,8 +61,13 @@ export default function CartDrawer() {
                     <span>{item.qty}</span>
                     <button onClick={() => updateQty(item.partNo, item.qty + 1)}>+</button>
                   </div>
-                  <div className={styles.itemPrice}>
-                    ${(item.price * item.qty).toFixed(2)}
+                  <div className={styles.itemPrice} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', lineHeight: '1.2' }}>
+                    <span style={{ color: 'var(--price-color)', fontSize: '1.1rem', fontWeight: 'bold' }}>
+                      ${(item.price * item.qty).toFixed(2)}
+                    </span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                      ¢{Math.round((item.priceCRC || 0) * item.qty).toLocaleString('es-CR')}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -67,7 +79,14 @@ export default function CartDrawer() {
           <div className={styles.cartFooter}>
             <div className={styles.subtotalGroup}>
               <span className={styles.subtotalLabel}>Subtotal</span>
-              <span className={styles.subtotalValue}>${subtotal.toFixed(2)}</span>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', lineHeight: '1.2' }}>
+                <span className={styles.subtotalValue} style={{ color: 'var(--price-color)', fontSize: '1.25rem', fontWeight: 'bold' }}>
+                  ${subtotal.toFixed(2)}
+                </span>
+                <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                  ¢{Math.round(subtotalCRC || 0).toLocaleString('es-CR')}
+                </span>
+              </div>
             </div>
             
             <p className={styles.disclaimer}>

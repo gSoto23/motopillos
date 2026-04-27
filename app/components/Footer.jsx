@@ -10,16 +10,10 @@ export default function Footer() {
         </div>
         <div className={styles.links}>
           <div className={styles.column}>
-            <h3>Tienda</h3>
-            <a href="#">Motos Deportivas</a>
-            <a href="#">Motos de Tierra</a>
-            <a href="#">ATV & SXS</a>
-          </div>
-          <div className={styles.column}>
             <h3>Soporte</h3>
             <a href="#">Contáctanos</a>
             <a href="#">Política de Envíos</a>
-            <a href="#">Devoluciones</a>
+            <a href="#">Términos y Condiciones</a>
           </div>
         </div>
       </div>

@@ -1,87 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
+model brands {
+  id       Int        @id @default(autoincrement())
+  name     String     @unique(map: "sqlite_autoindex_brands_1")
+  vehicles vehicles[]
 }
 
-model Category {
-  id        String   @id @default(uuid())
-  slug      String   @unique // e.g. "sport-bike"
-  name      String   // e.g. "Moto Deportiva"
-  makes     Make[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model categories {
+  id                   Int                 @id @default(autoincrement())
+  vehicle_id           Int
+  name                 String
+  slug                 String?
+  diagram_image_path   String?
+  original_diagram_url String?
+  vehicles             vehicles            @relation(fields: [vehicle_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  category_products    category_products[]
+
+  @@unique([vehicle_id, slug], map: "sqlite_autoindex_categories_1")
+  @@index([vehicle_id], map: "idx_category_vehicle")
 }
 
-model Make {
-  id         String   @id @default(uuid())
-  slug       String   @unique // e.g. "honda"
-  name       String   // e.g. "Honda"
-  categoryId String
-  category   Category @relation(fields: [categoryId], references: [id])
-  years      ModelYear[]
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+model category_products {
+  id                 Int        @id @default(autoincrement())
+  category_id        Int
+  product_sku        String
+  diagram_ref_number String?
+  products           products   @relation(fields: [product_sku], references: [sku], onDelete: Cascade, onUpdate: NoAction)
+  categories         categories @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([product_sku], map: "idx_cat_prod_sku")
+  @@index([category_id], map: "idx_cat_prod_cat")
 }
 
-model ModelYear {
-  id        String   @id @default(uuid())
-  year      Int      // e.g. 2023
-  makeId    String
-  make      Make     @relation(fields: [makeId], references: [id])
-  models    VehicleModel[]
-  
-  @@unique([year, makeId])
+model products {
+  sku               String              @id
+  name              String
+  current_price     Float?
+  category_products category_products[]
 }
 
-model VehicleModel {
-  id         String     @id @default(uuid())
-  slug       String     // e.g. "cbr600rr"
-  name       String     // e.g. "CBR600RR"
-  yearId     String
-  year       ModelYear  @relation(fields: [yearId], references: [id])
-  assemblies ComponentAssembly[]
+model vehicles {
+  id         Int          @id @default(autoincrement())
+  brand_id   Int
+  year       Int
+  model_name String
+  slug       String?
+  categories categories[]
+  brands     brands       @relation(fields: [brand_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@unique([slug, yearId])
+  @@unique([brand_id, year, model_name], map: "sqlite_autoindex_vehicles_1")
+  @@index([year], map: "idx_vehicle_year")
+  @@index([brand_id], map: "idx_vehicle_brand")
 }
 
-model ComponentAssembly {
-  id          String   @id @default(uuid())
-  slug        String   // e.g. "air-cleaner"
-  name        String   // e.g. "Filtro de Aire"
-  diagramUrl  String?  // AWS S3 URL
-  modelId     String
-  model       VehicleModel @relation(fields: [modelId], references: [id])
-  parts       Part[]
-
-  @@unique([slug, modelId])
-}
-
-model Part {
-  id             String   @id @default(uuid())
-  refNumber      String   // e.g. "001"
-  partNumber     String   // e.g. "17210-MFJ-D00"
-  name           String   // e.g. "CASE SUB ASSY., AIR CLEANER"
-  basePriceMSRP  Float
-  basePriceSale  Float
-  stockStatus    String   // e.g. "En Stock", "Agotado"
-  hotspotX       Float?   // Percentage 0-100 left
-  hotspotY       Float?   // Percentage 0-100 top
-  assemblyId     String
-  assembly       ComponentAssembly @relation(fields: [assemblyId], references: [id])
-  
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-}
-
+// Modelos de Comercio Frontend Originals
 model AppConfiguration {
   id                  String   @id @default(uuid())
-  key                 String   @unique // e.g. "GLOBAL_MARGIN"
-  marginMultiplier    Float    @default(1.0) // e.g. 1.25 for +25%
-  baseShippingCost    Float    @default(0.0) // Flat cost added to cart
+  key                 String   @unique
+  marginMultiplier    Float    @default(1.0)
+  baseShippingCost    Float    @default(0.0)
+  exchangeRate        Float    @default(515.0)
   sinpePhone          String?
   sinpeName           String?
   transferAccount     String?
@@ -96,9 +81,9 @@ model Order {
   customerPhone   String
   shippingAddress String
   totalAmount     Float
-  paymentMethod   String   // "TARJETA", "SINPE", "TRANSFERENCIA"
-  status          String   @default("PENDING") // "PENDING", "APPROVED", "SHIPPED", "CANCELLED"
-  itemsList       String   // JSON stringified array of items
+  paymentMethod   String   
+  status          String   @default("PENDING")
+  itemsList       String   
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }

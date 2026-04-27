@@ -45,10 +45,11 @@ export function CartProvider({ children }) {
   };
 
   const subtotal = items.reduce((acc, item) => acc + (item.price * item.qty), 0);
+  const subtotalCRC = items.reduce((acc, item) => acc + ((item.priceCRC || 0) * item.qty), 0);
   const totalItems = items.reduce((acc, item) => acc + item.qty, 0);
 
   return (
-    <CartContext.Provider value={{ items, isOpen, setIsOpen, addToCart, removeFromCart, updateQty, subtotal, totalItems, isLoaded }}>
+    <CartContext.Provider value={{ items, isOpen, setIsOpen, addToCart, removeFromCart, updateQty, subtotal, subtotalCRC, totalItems, isLoaded }}>
       {children}
     </CartContext.Provider>
   );

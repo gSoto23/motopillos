@@ -8,6 +8,7 @@ import styles from './AdminDashboard.module.css';
 export default function AdminDashboard() {
   const [margin, setMargin] = useState(1.25);
   const [shipping, setShipping] = useState(15.00);
+  const [exchangeRate, setExchangeRate] = useState(515.0);
   const [sinpePhone, setSinpePhone] = useState('8888-8888');
   const [sinpeName, setSinpeName] = useState('Motopillos');
   const [transferAccount, setTransferAccount] = useState('CR123456789');
@@ -20,6 +21,7 @@ export default function AdminDashboard() {
       const config = await getAdminConfig();
       setMargin(config.marginMultiplier);
       setShipping(config.baseShippingCost);
+      if (config.exchangeRate) setExchangeRate(config.exchangeRate);
       if (config.sinpePhone) setSinpePhone(config.sinpePhone);
       if (config.sinpeName) setSinpeName(config.sinpeName);
       if (config.transferAccount) setTransferAccount(config.transferAccount);
@@ -31,7 +33,7 @@ export default function AdminDashboard() {
 
   const handleSave = async () => {
     setIsSaving(true);
-    const result = await saveAdminConfig(margin, shipping, sinpePhone, sinpeName, transferAccount, transferName);
+    const result = await saveAdminConfig(margin, shipping, exchangeRate, sinpePhone, sinpeName, transferAccount, transferName);
     setIsSaving(false);
     
     if (result.success) {
@@ -118,6 +120,31 @@ export default function AdminDashboard() {
                     step="0.50" 
                     value={shipping} 
                     onChange={(e) => setShipping(Number(e.target.value))} 
+                    className={styles.numInputWithPrefix}
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className={`${styles.configCard} glass-panel`}>
+            <div className={styles.cardHeader}>
+              <TrendingUp className={styles.cardIcon} />
+              <h3>Tipo de Cambio (Colones ¢)</h3>
+            </div>
+            <div className={styles.cardBody}>
+              <p className={styles.helpText}>
+                Tasa de conversión utilizada para mostrar automáticamente el equivalente en moneda local (CRC) al cliente en el catálogo de repuestos.
+              </p>
+              <div className={styles.inputGroup}>
+                <label>Colones por 1 USD</label>
+                <div className={styles.inputWrapper}>
+                  <span className={styles.currencyPrefix}>¢</span>
+                  <input 
+                    type="number" 
+                    step="0.50" 
+                    value={exchangeRate} 
+                    onChange={(e) => setExchangeRate(Number(e.target.value))} 
                     className={styles.numInputWithPrefix}
                   />
                 </div>

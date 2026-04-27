@@ -1,15 +1,19 @@
 import styles from "./page.module.css";
 import Link from 'next/link';
-import { ChevronRight, Settings, Wrench, Navigation, Bike, Compass } from 'lucide-react';
+import { ChevronRight, Settings, Wrench, Navigation, Bike, Compass, Crosshair, Box, PackageCheck } from 'lucide-react';
 
-export default function Home() {
-  const categories = [
-    { title: "ATV", icon: <Settings size={32} />, href: "/catalog/atv", count: "+8k Repuestos" },
-    { title: "Sport Bikes", icon: <Bike size={32} />, href: "/catalog/sport-bike", count: "+12k Repuestos" },
-    { title: "Dirt Bikes", icon: <Wrench size={32} />, href: "/catalog/dirt-bike", count: "+15k Repuestos" },
-    { title: "Touring", icon: <Navigation size={32} />, href: "/catalog/touring", count: "+5k Repuestos" },
-    { title: "Cruiser", icon: <Compass size={32} />, href: "/catalog/cruiser", count: "+4k Repuestos" },
-  ];
+import { getBrands } from '@/app/actions/catalogActions';
+
+export default async function Home() {
+  const brands = await getBrands();
+
+  const brandMetadata = {
+    'HONDA': { color: '#E1251B', logo: '/brands/honda.png' },
+    'YAMAHA': { color: '#0b1a50', logo: '/brands/yamaha.png' },
+    'KAWASAKI': { color: '#51af42', logo: '/brands/kawasaki.png' },
+    'SUZUKI': { color: '#FFCC00', logo: '/brands/suzuki.png' },
+    'CFMOTO': { color: '#3a9ca0', logo: '/brands/cfmoto.png' },
+  };
 
   return (
     <div className={styles.container}>
@@ -25,20 +29,38 @@ export default function Home() {
         
         <div className={styles.heroGridContainer}>
           <div className={styles.grid}>
-            {categories.map((cat, i) => (
-              <Link href={cat.href} key={i} className={`${styles.card} glass-panel`}>
-                <div className={styles.cardIcon}>
-                  {cat.icon}
-                </div>
-                <div className={styles.cardContent}>
-                  <h3>{cat.title}</h3>
-                  <span className={styles.partCount}>{cat.count}</span>
-                </div>
-                <div className={styles.cardArrow}>
-                  <ChevronRight size={24} />
-                </div>
-              </Link>
-            ))}
+            {brands.map((brand) => {
+              const meta = brandMetadata[brand.name.toUpperCase()] || { color: 'var(--accent-red)', logo: null };
+              
+              return (
+                <Link 
+                  href={`/catalog/brand/${brand.id}`} 
+                  key={brand.id} 
+                  className={`${styles.card} glass-panel`}
+                  style={{ '--brand-color': meta.color }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    {meta.logo ? (
+                      <div style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <img 
+                          src={meta.logo} 
+                          alt={`Logo ${brand.name}`} 
+                          style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }} 
+                        />
+                      </div>
+                    ) : (
+                      <div className={styles.cardIcon}>
+                        <Bike size={24} />
+                      </div>
+                    )}
+                    <h3 style={{ textTransform: 'uppercase', fontSize: '1.25rem', fontWeight: 'bold' }}>{brand.name}</h3>
+                  </div>
+                  <div className={styles.cardArrow}>
+                    <ChevronRight size={24} />
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
 
@@ -47,6 +69,38 @@ export default function Home() {
           <div className={styles.gradientOrb2}></div>
         </div>
       </header>
+
+      {/* Informative Section - How it Works */}
+      <section className={styles.infoSection}>
+        <h2>¿Cómo funciona Motopillos?</h2>
+        <div className={styles.infoGrid}>
+          
+          <div className={styles.infoCard}>
+            <div className={styles.infoIcon}>
+              <Crosshair size={48} strokeWidth={1.5} />
+            </div>
+            <h3>1. Precisión Absoluta</h3>
+            <p>Selecciona tu marca, año y modelo exacto. Navega por los diagramas de despiece originales directamente de fábrica.</p>
+          </div>
+
+          <div className={styles.infoCard}>
+            <div className={styles.infoIcon}>
+              <Box size={48} strokeWidth={1.5} />
+            </div>
+            <h3>2. Piezas 100% Originales</h3>
+            <p>Trabajamos exclusivamente con números de parte OEM. Garantizamos que el repuesto ajustará perfectamente en tu moto.</p>
+          </div>
+
+          <div className={styles.infoCard}>
+            <div className={styles.infoIcon}>
+              <PackageCheck size={48} strokeWidth={1.5} />
+            </div>
+            <h3>3. Importación Directa</h3>
+            <p>Importamos tu pieza directamente desde USA hasta la puerta de tu casa. Paga seguro y relájate mientras el repuesto llega.</p>
+          </div>
+          
+        </div>
+      </section>
     </div>
   );
 }
