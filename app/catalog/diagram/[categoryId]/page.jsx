@@ -3,7 +3,7 @@ import { getAdminConfig } from '@/app/actions/adminActions';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import ZoomableImage from '@/app/components/ZoomableImage';
-import PartItemCard from '@/app/components/PartItemCard';
+import DiagramPartsList from '@/app/components/DiagramPartsList';
 import styles from './Diagram.module.css';
 
 export default async function DiagramView({ params }) {
@@ -34,14 +34,29 @@ export default async function DiagramView({ params }) {
         </Link>
       </div>
 
-      <h1 style={{ fontSize: '2rem', marginBottom: '2rem' }}>{diagram.name}</h1>
+      <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>{diagram.name}</h1>
+
+      <div style={{ 
+        background: 'var(--bg-secondary)', 
+        border: '1px solid var(--border-color)', 
+        borderLeft: '4px solid var(--accent-red)', 
+        padding: '1rem', 
+        borderRadius: '6px', 
+        marginBottom: '2rem', 
+        fontSize: '0.95rem',
+        lineHeight: '1.5',
+        color: 'var(--text-muted)'
+      }}>
+        <strong style={{ color: 'var(--text-primary)', display: 'block', marginBottom: '0.2rem' }}>⚠️ Verificar Cantidades</strong>
+        Revisa el diagrama cuidadosamente. Si tu ensamble requiere múltiples unidades de un mismo número (ej: 6 tornillos idénticos), asegúrate de ajustar la cantidad de piezas manualmente antes de añadirlas al carrito.
+      </div>
 
       <div className={styles.gridContainer}>
         
         <div className={styles.diagramSide}>
-          {diagram.original_diagram_url || diagram.diagram_image_path ? (
+          {diagram.diagram_image_path || diagram.original_diagram_url ? (
             <ZoomableImage 
-              src={diagram.original_diagram_url || diagram.diagram_image_path} 
+              src={diagram.diagram_image_path || diagram.original_diagram_url} 
               alt={`Diagrama de ${diagram.name}`}
             />
           ) : (
@@ -57,24 +72,7 @@ export default async function DiagramView({ params }) {
             Repuestos
           </h2>
           
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            {parts.length === 0 && <p>No hay repuestos indexados.</p>}
-            {parts.map((part, index) => {
-              const basePrice = part.price || 0;
-              const finalPriceUSD = basePrice * (config.marginMultiplier || 1.0);
-              const finalPriceCRC = finalPriceUSD * (config.exchangeRate || 515.0);
-
-              return (
-                <PartItemCard 
-                  key={`${part.sku}-${index}`} 
-                  part={part} 
-                  finalPriceUSD={finalPriceUSD} 
-                  finalPriceCRC={finalPriceCRC} 
-                  vehicleMeta={vehicleMeta}
-                />
-              );
-            })}
-          </div>
+          <DiagramPartsList parts={parts} config={config} vehicleMeta={vehicleMeta} />
         </div>
 
       </div>

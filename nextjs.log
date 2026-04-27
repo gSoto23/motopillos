@@ -926,3 +926,104 @@ Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
  GET / 200 in 53ms (next.js: 14ms, application-code: 38ms)
  GET / 200 in 57ms (next.js: 34ms, application-code: 23ms)
  GET / 200 in 44ms (next.js: 1552µs, application-code: 43ms)
+  Reload env: .env
+Prisma Client Re-initialized cleanly
+✓ Compiled in 2.5s
+ GET / 200 in 1763ms (next.js: 1677ms, application-code: 87ms)
+  Reload env: .env
+Prisma Client Re-initialized cleanly
+ GET / 200 in 914ms (next.js: 768ms, application-code: 146ms)
+ GET / 200 in 1593ms (next.js: 176ms, application-code: 1417ms)
+ GET /catalog/brand/1 200 in 281ms (next.js: 166ms, application-code: 115ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/brand/1/year/2026 200 in 196ms (next.js: 143ms, application-code: 53ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/vehicle/921 200 in 181ms (next.js: 89ms, application-code: 93ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/diagram/60504 200 in 320ms (next.js: 175ms, application-code: 145ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/vehicle/921 200 in 122ms (next.js: 35ms, application-code: 87ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/diagram/60524 200 in 48ms (next.js: 18ms, application-code: 31ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/vehicle/921 200 in 48ms (next.js: 12ms, application-code: 36ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/diagram/60519 200 in 32ms (next.js: 6ms, application-code: 26ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/vehicle/921 200 in 70ms (next.js: 13ms, application-code: 56ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/diagram/60479 200 in 54ms (next.js: 11ms, application-code: 42ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/vehicle/921 200 in 167ms (next.js: 55ms, application-code: 112ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/brand/1/year/2026 200 in 36ms (next.js: 12ms, application-code: 24ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/brand/1 200 in 46ms (next.js: 26ms, application-code: 20ms)
+Prisma Client Re-initialized cleanly
+ GET / 200 in 39ms (next.js: 12ms, application-code: 27ms)
+ GET /catalog/brand/4 200 in 49ms (next.js: 13ms, application-code: 36ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/brand/4/year/2011 200 in 54ms (next.js: 36ms, application-code: 18ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/vehicle/4810 200 in 58ms (next.js: 15ms, application-code: 43ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/diagram/284531 200 in 46ms (next.js: 13ms, application-code: 33ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/vehicle/4810 200 in 56ms (next.js: 11ms, application-code: 45ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/brand/4/year/2011 200 in 41ms (next.js: 13ms, application-code: 29ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/brand/4 200 in 21ms (next.js: 6ms, application-code: 15ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/brand/4/year/2013 200 in 47ms (next.js: 13ms, application-code: 34ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/vehicle/4331 200 in 40ms (next.js: 10ms, application-code: 30ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/diagram/244654 200 in 35ms (next.js: 9ms, application-code: 26ms)
+Prisma Client Re-initialized cleanly
+ GET / 200 in 67ms (next.js: 28ms, application-code: 39ms)
+ GET /catalog/brand/1 200 in 121ms (next.js: 37ms, application-code: 84ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/brand/1/year/2016 200 in 75ms (next.js: 22ms, application-code: 53ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/vehicle/1293 200 in 70ms (next.js: 20ms, application-code: 50ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/diagram/84706 200 in 67ms (next.js: 14ms, application-code: 52ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/vehicle/1293 200 in 71ms (next.js: 17ms, application-code: 54ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/diagram/84698 200 in 68ms (next.js: 24ms, application-code: 44ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/vehicle/1293 200 in 78ms (next.js: 19ms, application-code: 59ms)
+Prisma Client Re-initialized cleanly
+ GET / 200 in 80ms (next.js: 12ms, application-code: 69ms)
+ GET / 200 in 667ms (next.js: 139ms, application-code: 528ms)
+ GET / 200 in 381ms (next.js: 78ms, application-code: 302ms)
+ GET /catalog/brand/4 200 in 193ms (next.js: 61ms, application-code: 131ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/brand/4/year/2022 200 in 88ms (next.js: 28ms, application-code: 59ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/vehicle/4393 200 in 104ms (next.js: 25ms, application-code: 78ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/diagram/249721 200 in 78ms (next.js: 17ms, application-code: 61ms)
+Prisma Client Re-initialized cleanly
+ GET / 200 in 125ms (next.js: 23ms, application-code: 102ms)
+ GET /catalog/brand/1 200 in 132ms (next.js: 57ms, application-code: 75ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/brand/1/year/2017 200 in 46ms (next.js: 12ms, application-code: 34ms)
+Prisma Client Re-initialized cleanly
+Prisma Client Re-initialized cleanly
+ GET /catalog/vehicle/858 200 in 480ms (next.js: 12ms, application-code: 468ms)
+ GET /catalog/diagram/56717 200 in 80ms (next.js: 21ms, application-code: 59ms)
+Prisma Client Re-initialized cleanly
+ GET / 200 in 178ms (next.js: 51ms, application-code: 127ms)
+ GET / 200 in 91ms (next.js: 20ms, application-code: 71ms)
+ GET /catalog/brand/1 200 in 86ms (next.js: 25ms, application-code: 61ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/brand/1/year/2022 200 in 58ms (next.js: 11ms, application-code: 47ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/vehicle/132 200 in 71ms (next.js: 10ms, application-code: 61ms)
+Prisma Client Re-initialized cleanly
+ GET /catalog/diagram/8569 200 in 50ms (next.js: 9ms, application-code: 41ms)
+Prisma Client Re-initialized cleanly
+[?25h

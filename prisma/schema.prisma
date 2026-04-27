@@ -3,13 +3,13 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model brands {
   id       Int        @id @default(autoincrement())
-  name     String     @unique(map: "sqlite_autoindex_brands_1")
+  name     String     @unique
   vehicles vehicles[]
 }
 
@@ -23,7 +23,7 @@ model categories {
   vehicles             vehicles            @relation(fields: [vehicle_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   category_products    category_products[]
 
-  @@unique([vehicle_id, slug], map: "sqlite_autoindex_categories_1")
+  @@unique([vehicle_id, slug])
   @@index([vehicle_id], map: "idx_category_vehicle")
 }
 
@@ -55,7 +55,7 @@ model vehicles {
   categories categories[]
   brands     brands       @relation(fields: [brand_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@unique([brand_id, year, model_name], map: "sqlite_autoindex_vehicles_1")
+  @@unique([brand_id, year, model_name])
   @@index([year], map: "idx_vehicle_year")
   @@index([brand_id], map: "idx_vehicle_brand")
 }

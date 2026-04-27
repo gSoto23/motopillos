@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import styles from './Footer.module.css';
 
 export default function Footer() {
@@ -11,9 +12,9 @@ export default function Footer() {
         <div className={styles.links}>
           <div className={styles.column}>
             <h3>Soporte</h3>
-            <a href="#">Contáctanos</a>
-            <a href="#">Política de Envíos</a>
-            <a href="#">Términos y Condiciones</a>
+            <Link href="/contacto">Contáctanos</Link>
+            <Link href="/politica-de-envios">Política de Envíos</Link>
+            <Link href="/terminos-y-condiciones">Términos y Condiciones</Link>
           </div>
         </div>
       </div>
