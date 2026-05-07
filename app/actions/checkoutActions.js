@@ -1,5 +1,6 @@
 "use server";
 import { prisma } from '@/lib/prisma';
+import { sendOrderConfirmationEmail } from '@/lib/email';
 
 export async function verifyCartInventory(cartItems) {
   // Silent Server-Side JIT Verification.
@@ -37,8 +38,8 @@ export async function createOrder(orderData) {
   try {
     const { customerName, customerEmail, customerPhone, shippingAddress, totalAmount, paymentMethod, itemsList } = orderData;
     
-    // TARJETA is considered APPROVED instantly (dummy stripe). SINPE/TRANSFER are PENDING.
-    const initialStatus = paymentMethod === 'TARJETA' ? 'APPROVED' : 'PENDING';
+    // All start as PENDING. TARJETA will be approved via Webhook.
+    const initialStatus = 'PENDING';
 
     const order = await prisma.order.create({
       data: {
@@ -52,6 +53,12 @@ export async function createOrder(orderData) {
          itemsList: JSON.stringify(itemsList)
       }
     });
+
+    // Send confirmation email asynchronously only for offline methods
+    // For TARJETA, the email is sent from the webhook upon successful payment
+    if (paymentMethod !== 'TARJETA') {
+      sendOrderConfirmationEmail(order).catch(err => console.error("Email error:", err));
+    }
 
     return { success: true, orderId: order.id };
   } catch (error) {

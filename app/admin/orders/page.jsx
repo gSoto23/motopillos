@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { Settings, ArrowLeft, Activity, Database, Package, CheckCircle, Clock, XCircle } from 'lucide-react';
 import styles from '../AdminDashboard.module.css';
 import { prisma } from '@/lib/prisma';
+import { getAdminConfig } from '@/app/actions/adminActions';
+import OrdersTableClient from './OrdersTableClient';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,6 +11,7 @@ export default async function OrdersDashboard() {
   const orders = await prisma.order.findMany({
     orderBy: { createdAt: 'desc' }
   });
+  const adminConfig = await getAdminConfig();
 
   return (
     <div className={styles.adminContainer}>
@@ -34,50 +37,7 @@ export default async function OrdersDashboard() {
           <p>Supervisa las compras realizadas y aprueba manualmente los pagos por transferencia o SINPE.</p>
         </header>
 
-        <div className={styles.tableContainer}>
-          <table className={styles.ordersTable}>
-            <thead>
-              <tr>
-                <th>Hash</th>
-                <th>Cliente</th>
-                <th>Método</th>
-                <th>Total</th>
-                <th>Estado</th>
-                <th>Fecha</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.length === 0 ? (
-                <tr>
-                  <td colSpan="7" className={styles.emptyState}>No hay órdenes registradas aún.</td>
-                </tr>
-              ) : (
-                orders.map(order => (
-                  <tr key={order.id}>
-                    <td className={styles.mono}>{order.id.split('-')[0]}</td>
-                    <td>
-                      <div className={styles.clientName}>{order.customerName}</div>
-                      <div className={styles.clientContact}>{order.customerPhone}</div>
-                    </td>
-                    <td><span className={styles.methodBadge}>{order.paymentMethod}</span></td>
-                    <td className={styles.priceCell}>${order.totalAmount.toFixed(2)}</td>
-                    <td>
-                      <span className={`${styles.statusBadge} ${styles[order.status.toLowerCase()]}`}>
-                        {order.status === 'APPROVED' ? <CheckCircle size={14}/> : order.status === 'PENDING' ? <Clock size={14}/> : <XCircle size={14}/>}
-                        {order.status}
-                      </span>
-                    </td>
-                    <td className={styles.dateCell}>{new Date(order.createdAt).toLocaleDateString()}</td>
-                    <td>
-                      <button className={styles.actionBtn}>Ver / Aprobar</button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <OrdersTableClient initialOrders={orders} adminConfig={adminConfig} />
       </main>
     </div>
   );

@@ -9,7 +9,7 @@ import { CheckCircle, AlertCircle, Loader2, CreditCard, Truck } from 'lucide-rea
 import styles from './Checkout.module.css';
 
 export default function CheckoutPage() {
-  const { items, subtotal, removeFromCart } = useCart();
+  const { items, subtotal, removeFromCart, clearCart } = useCart();
   const router = useRouter();
   
   const [step, setStep] = useState('verifying'); // verifying | form | success
@@ -67,7 +67,49 @@ export default function CheckoutPage() {
     name: '', email: '', address: '', phone: '', paymentMethod: 'TARJETA'
   });
 
+  const [provincias, setProvincias] = useState({});
+  const [cantones, setCantones] = useState({});
+  const [distritos, setDistritos] = useState({});
+
+  const [selectedProv, setSelectedProv] = useState('');
+  const [selectedCanton, setSelectedCanton] = useState('');
+  const [selectedDistrito, setSelectedDistrito] = useState('');
+
+  useEffect(() => {
+    fetch('https://ubicaciones.paginasweb.cr/provincias.json')
+      .then(res => res.json())
+      .then(data => setProvincias(data)).catch(err => console.error(err));
+  }, []);
+
+  useEffect(() => {
+    if (selectedProv) {
+      fetch(`https://ubicaciones.paginasweb.cr/provincia/${selectedProv}/cantones.json`)
+        .then(res => res.json())
+        .then(data => { setCantones(data); setSelectedCanton(''); setDistritos({}); setSelectedDistrito(''); })
+        .catch(err => console.error(err));
+    } else {
+      setCantones({}); setDistritos({});
+    }
+  }, [selectedProv]);
+
+  useEffect(() => {
+    if (selectedProv && selectedCanton) {
+      fetch(`https://ubicaciones.paginasweb.cr/provincia/${selectedProv}/canton/${selectedCanton}/distritos.json`)
+        .then(res => res.json())
+        .then(data => { setDistritos(data); setSelectedDistrito(''); })
+        .catch(err => console.error(err));
+    } else {
+      setDistritos({});
+    }
+  }, [selectedProv, selectedCanton]);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const shippingCost = adminConfig?.baseShippingCost || 0;
+  const ivaAmount = subtotal * 0.13;
+  const totalUSD = subtotal + ivaAmount + shippingCost;
+  const exchangeRate = adminConfig?.exchangeRate || 515;
+  const totalCRC = totalUSD * exchangeRate;
 
   const handleCheckoutSubmit = async (e) => {
     e.preventDefault();
@@ -77,19 +119,59 @@ export default function CheckoutPage() {
       customerName: formData.name,
       customerEmail: formData.email,
       customerPhone: formData.phone,
-      shippingAddress: formData.address,
-      totalAmount: subtotal + 25, // Including global shipping
+      shippingAddress: `${provincias[selectedProv] || ''}, ${cantones[selectedCanton] || ''}, ${distritos[selectedDistrito] || ''}. ${formData.address}`,
+      totalAmount: totalUSD,
       paymentMethod: formData.paymentMethod,
       itemsList: items
     };
 
     const result = await createOrder(orderData);
     
-    setIsSubmitting(false);
-    
     if (result.success) {
-      setStep('success');
+      if (formData.paymentMethod === 'TARJETA') {
+        // Redirigir a Tilopay
+        setLoadingMsg('Conectando con pasarela de pago seguro...');
+        setStep('verifying'); // Re-use verification screen for loading
+        
+        try {
+          const tRes = await fetch('/api/tilopay/checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              orderId: result.orderId,
+              amount: totalCRC,
+              customerName: formData.name,
+              customerEmail: formData.email,
+              provincia: provincias[selectedProv] || '',
+              canton: cantones[selectedCanton] || '',
+              distrito: distritos[selectedDistrito] || '',
+              address: formData.address,
+              phone: formData.phone
+            })
+          });
+          
+          const tData = await tRes.json();
+          if (tData.url) {
+            window.location.href = tData.url;
+            return; // Exit here, let the browser redirect
+          } else {
+            alert('Error generando link de pago. Por favor contacta soporte.');
+            setIsSubmitting(false);
+            setStep('form');
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Error conectando a Tilopay. Intenta de nuevo.');
+          setIsSubmitting(false);
+          setStep('form');
+        }
+      } else {
+        setIsSubmitting(false);
+        clearCart();
+        setStep('success');
+      }
     } else {
+      setIsSubmitting(false);
       alert("Hubo un error procesando tu orden. Por favor intenta de nuevo.");
     }
   };
@@ -129,10 +211,10 @@ export default function CheckoutPage() {
         )}
 
         {step === 'form' && (
-          <div className={styles.checkoutLayout}>
+          <form onSubmit={handleCheckoutSubmit} className={styles.checkoutLayout}>
             <div className={styles.formSection}>
               <h2>Información de Envío</h2>
-              <form onSubmit={handleCheckoutSubmit} className={styles.form}>
+              <div className={styles.form}>
                 <div className={styles.inputGroup}>
                   <label>Nombre Completo</label>
                   <input required type="text" placeholder="Juan Pérez" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
@@ -142,14 +224,83 @@ export default function CheckoutPage() {
                   <input required type="email" placeholder="juan@ejemplo.com" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Dirección de Envío</label>
-                  <input required type="text" placeholder="Calle Falsa 123" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} />
+                  <label>Provincia</label>
+                  <select required value={selectedProv} onChange={e => setSelectedProv(e.target.value)} className={styles.selectInput}>
+                    <option value="">Seleccione Provincia</option>
+                    {Object.entries(provincias).map(([id, name]) => (
+                      <option key={id} value={id}>{name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div style={{display: 'flex', gap: '10px'}}>
+                  <div className={styles.inputGroup} style={{flex: 1}}>
+                    <label>Cantón</label>
+                    <select required value={selectedCanton} onChange={e => setSelectedCanton(e.target.value)} disabled={!selectedProv} className={styles.selectInput}>
+                      <option value="">Seleccione Cantón</option>
+                      {Object.entries(cantones).map(([id, name]) => (
+                        <option key={id} value={id}>{name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className={styles.inputGroup} style={{flex: 1}}>
+                    <label>Distrito</label>
+                    <select required value={selectedDistrito} onChange={e => setSelectedDistrito(e.target.value)} disabled={!selectedCanton} className={styles.selectInput}>
+                      <option value="">Seleccione Distrito</option>
+                      {Object.entries(distritos).map(([id, name]) => (
+                        <option key={id} value={id}>{name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className={styles.inputGroup}>
+                  <label>Dirección Exacta</label>
+                  <input required type="text" placeholder="100m norte de la iglesia..." value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} />
                 </div>
                 <div className={styles.inputGroup}>
                   <label>Celular</label>
                   <input required type="tel" placeholder="8888-8888" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
                 </div>
                 
+              </div>
+            </div>
+
+            <div className={styles.orderSummary}>
+              <h2>Resumen de Orden</h2>
+              <div className={styles.summaryItems}>
+                {items.map((item, index) => (
+                  <div key={item.partNo || index} className={styles.summaryItem}>
+                    <div className={styles.itemDetails}>
+                      <span className={styles.itemName}>{item.name.substring(0, 30)}...</span>
+                      <span className={styles.itemQty}>Cant: {item.qty}</span>
+                    </div>
+                    <span className={styles.itemPrice}>${(item.price * item.qty).toFixed(2)}</span>
+                  </div>
+                ))}
+              </div>
+              
+              <div className={styles.totals}>
+                <div className={styles.totalRow}>
+                  <span>Subtotal</span>
+                  <span>${subtotal.toFixed(2)}</span>
+                </div>
+                <div className={styles.totalRow}>
+                  <span>IVA (13%)</span>
+                  <span>${ivaAmount.toFixed(2)}</span>
+                </div>
+                <div className={styles.totalRow}>
+                  <span>Envío Nacional</span>
+                  <span>${shippingCost.toFixed(2)}</span>
+                </div>
+                <div className={`${styles.totalRow} ${styles.grandTotal}`}>
+                  <span>Total a Pagar</span>
+                  <div style={{ textAlign: 'right' }}>
+                    <div>${totalUSD.toFixed(2)} USD</div>
+                    <div style={{ fontSize: '0.85em', color: '#666', marginTop: '4px' }}>₡{totalCRC.toLocaleString('es-CR', {maximumFractionDigits: 0})} CRC</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className={styles.paymentSectionRight} style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
                 <div className={styles.paymentMethods}>
                   <h3>Método de Pago</h3>
                   <div className={styles.radioGroup}>
@@ -189,42 +340,13 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
-                <button type="submit" disabled={isSubmitting} className={styles.submitBtn}>
-                  {isSubmitting ? 'Procesando...' : `Confirmar y Pagar $${(subtotal + 25).toFixed(2)} USD`}
+                <button type="submit" disabled={isSubmitting} className={styles.submitBtn} style={{ width: '100%' }}>
+                  {isSubmitting ? 'Procesando...' : `Confirmar y Pagar $${totalUSD.toFixed(2)} USD / ₡${totalCRC.toLocaleString('es-CR', {maximumFractionDigits: 0})}`}
                 </button>
-              </form>
-            </div>
+              </div>
 
-            <div className={styles.orderSummary}>
-              <h2>Resumen de Orden</h2>
-              <div className={styles.summaryItems}>
-                {items.map((item, index) => (
-                  <div key={item.partNo || index} className={styles.summaryItem}>
-                    <div className={styles.itemDetails}>
-                      <span className={styles.itemName}>{item.name.substring(0, 30)}...</span>
-                      <span className={styles.itemQty}>Cant: {item.qty}</span>
-                    </div>
-                    <span className={styles.itemPrice}>${(item.price * item.qty).toFixed(2)}</span>
-                  </div>
-                ))}
-              </div>
-              
-              <div className={styles.totals}>
-                <div className={styles.totalRow}>
-                  <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
-                </div>
-                <div className={styles.totalRow}>
-                  <span>Envío Global</span>
-                  <span>$25.00</span>
-                </div>
-                <div className={`${styles.totalRow} ${styles.grandTotal}`}>
-                  <span>Total a Pagar</span>
-                  <span>${(subtotal + 25).toFixed(2)} USD</span>
-                </div>
-              </div>
             </div>
-          </div>
+          </form>
         )}
 
         {step === 'success' && (

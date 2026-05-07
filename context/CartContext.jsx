@@ -44,12 +44,16 @@ export function CartProvider({ children }) {
     setItems((prev) => prev.map(i => i.partNo === partNo ? { ...i, qty } : i));
   };
 
+  const clearCart = () => {
+    setItems([]);
+  };
+
   const subtotal = items.reduce((acc, item) => acc + (item.price * item.qty), 0);
   const subtotalCRC = items.reduce((acc, item) => acc + ((item.priceCRC || 0) * item.qty), 0);
   const totalItems = items.reduce((acc, item) => acc + item.qty, 0);
 
   return (
-    <CartContext.Provider value={{ items, isOpen, setIsOpen, addToCart, removeFromCart, updateQty, subtotal, subtotalCRC, totalItems, isLoaded }}>
+    <CartContext.Provider value={{ items, isOpen, setIsOpen, addToCart, removeFromCart, updateQty, clearCart, subtotal, subtotalCRC, totalItems, isLoaded }}>
       {children}
     </CartContext.Provider>
   );
