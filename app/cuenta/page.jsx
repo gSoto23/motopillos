@@ -3,6 +3,7 @@ import { verifySessionToken } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { redirect } from 'next/navigation';
 import { Package, MapPin, Phone, Mail, User, Clock, CheckCircle, PackageCheck, XCircle } from 'lucide-react';
+import ProfileEditor from './ProfileEditor';
 
 export default async function CuentaPage() {
   const cookieStore = await cookies();
@@ -53,47 +54,7 @@ export default async function CuentaPage() {
             Datos Personales
           </h2>
           
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <User size={20} color="var(--text-secondary)" />
-              </div>
-              <div>
-                <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Nombre</p>
-                <p style={{ margin: 0, fontWeight: '600' }}>{user.name}</p>
-              </div>
-            </div>
-            
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Mail size={20} color="var(--text-secondary)" />
-              </div>
-              <div>
-                <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Correo Electrónico</p>
-                <p style={{ margin: 0, fontWeight: '600' }}>{user.email}</p>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Phone size={20} color="var(--text-secondary)" />
-              </div>
-              <div>
-                <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Teléfono</p>
-                <p style={{ margin: 0, fontWeight: '600' }}>{user.phone || 'No registrado'}</p>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <MapPin size={20} color="var(--text-secondary)" />
-              </div>
-              <div>
-                <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Dirección de Envío Principal</p>
-                <p style={{ margin: 0, fontWeight: '600' }}>{user.address || 'No registrada'}</p>
-              </div>
-            </div>
-          </div>
+          <ProfileEditor user={user} />
         </div>
 
         {/* Order History Section */}

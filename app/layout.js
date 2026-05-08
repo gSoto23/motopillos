@@ -21,20 +21,23 @@ export const metadata = {
 };
 
 import { ThemeProvider } from '@/context/ThemeContext';
+import { UIProvider } from '@/context/UIContext';
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
       <body>
         <ThemeProvider>
-          <CartProvider>
-            <Navbar />
-            <CartDrawer />
-            <main className="main-content">
-              {children}
-            </main>
-            <Footer />
-          </CartProvider>
+          <UIProvider>
+            <CartProvider>
+              <Navbar />
+              <CartDrawer />
+              <main className="main-content">
+                {children}
+              </main>
+              <Footer />
+            </CartProvider>
+          </UIProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -4,8 +4,10 @@ import { useState } from 'react';
 import { CheckCircle, Clock, XCircle, Search, RefreshCw, MessageCircle, PackageCheck, Eye, X, ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import styles from '../AdminDashboard.module.css';
 import { updateOrderStatus, syncTilopayOrder } from '@/app/actions/orderAdminActions';
+import { useUI } from '@/context/UIContext';
 
 export default function OrdersTableClient({ initialOrders, adminConfig }) {
+  const { showToast, showConfirm } = useUI();
   const [orders, setOrders] = useState(initialOrders);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
@@ -26,28 +28,34 @@ export default function OrdersTableClient({ initialOrders, adminConfig }) {
     setSelectedOrder(null);
   };
 
-  const handleApprove = async (orderId) => {
-    if (!confirm('¿Estás seguro de que quieres aprobar esta orden?')) return;
-    setLoadingAction(orderId);
-    const res = await updateOrderStatus(orderId, 'APPROVED');
-    if (res.success) {
-      setOrders(orders.map(o => o.id === orderId ? { ...o, status: 'APPROVED' } : o));
-    } else {
-      alert('Error aprobando orden: ' + res.error);
-    }
-    setLoadingAction(null);
+  const handleApprove = (order) => {
+    const shortId = order.id.split('-')[0].toUpperCase();
+    showConfirm(`¿Estás seguro de que quieres aprobar la orden #${shortId} de ${order.customerName}?`, async () => {
+      setLoadingAction(order.id);
+      const res = await updateOrderStatus(order.id, 'APPROVED');
+      if (res.success) {
+        setOrders(prev => prev.map(o => o.id === order.id ? { ...o, status: 'APPROVED' } : o));
+        showToast('Orden aprobada', 'success');
+      } else {
+        showToast('Error aprobando orden: ' + res.error, 'error');
+      }
+      setLoadingAction(null);
+    });
   };
 
-  const handleDeliver = async (orderId) => {
-    if (!confirm('¿Marcar esta orden como entregada al cliente?')) return;
-    setLoadingAction(orderId);
-    const res = await updateOrderStatus(orderId, 'DELIVERED');
-    if (res.success) {
-      setOrders(orders.map(o => o.id === orderId ? { ...o, status: 'DELIVERED' } : o));
-    } else {
-      alert('Error actualizando orden: ' + res.error);
-    }
-    setLoadingAction(null);
+  const handleDeliver = (order) => {
+    const shortId = order.id.split('-')[0].toUpperCase();
+    showConfirm(`¿Marcar la orden #${shortId} de ${order.customerName} como entregada?`, async () => {
+      setLoadingAction(order.id);
+      const res = await updateOrderStatus(order.id, 'DELIVERED');
+      if (res.success) {
+        setOrders(prev => prev.map(o => o.id === order.id ? { ...o, status: 'DELIVERED' } : o));
+        showToast('Orden marcada como entregada', 'success');
+      } else {
+        showToast('Error actualizando orden: ' + res.error, 'error');
+      }
+      setLoadingAction(null);
+    });
   };
 
   const handleSyncTilopay = async (orderId) => {
@@ -56,12 +64,12 @@ export default function OrdersTableClient({ initialOrders, adminConfig }) {
     if (res.success) {
       if (res.statusUpdated) {
         setOrders(orders.map(o => o.id === orderId ? { ...o, status: 'APPROVED' } : o));
-        alert('Pago sincronizado exitosamente. Orden aprobada.');
+        showToast('Pago sincronizado exitosamente. Orden aprobada.', 'success');
       } else {
-        alert('El pago no figura como aprobado en Tilopay todavía.');
+        showToast('El pago no figura como aprobado en Tilopay todavía.', 'info');
       }
     } else {
-      alert('Error sincronizando con Tilopay: ' + res.error);
+      showToast('Error sincronizando con Tilopay: ' + res.error, 'error');
     }
     setLoadingAction(null);
   };
@@ -192,18 +200,24 @@ export default function OrdersTableClient({ initialOrders, adminConfig }) {
                     </td>
                     <td><span className={styles.methodBadge}>{order.paymentMethod}</span></td>
                     <td className={styles.priceCell}>
-                      <div>${order.totalAmount.toFixed(2)}</div>
-                      <div style={{ fontSize: '0.8em', color: '#a1a1aa' }}>
+                      <div style={{ fontWeight: 600 }}>
                         ₡{(order.totalAmount * (adminConfig?.exchangeRate || 515)).toLocaleString('es-CR', { maximumFractionDigits: 0 })}
                       </div>
                     </td>
                     <td>
-                      <span className={`${styles.statusBadge} ${styles[order.status.toLowerCase()] || ''}`}>
-                        {order.status === 'APPROVED' ? <CheckCircle size={14}/> : 
-                         order.status === 'DELIVERED' ? <PackageCheck size={14}/> : 
-                         order.status === 'PENDING' ? <Clock size={14}/> : <XCircle size={14}/>}
-                        {order.status}
-                      </span>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
+                        <span className={`${styles.statusBadge} ${styles[order.status.toLowerCase()] || ''}`}>
+                          {order.status === 'APPROVED' ? <CheckCircle size={14}/> : 
+                           order.status === 'DELIVERED' ? <PackageCheck size={14}/> : 
+                           order.status === 'PENDING' ? <Clock size={14}/> : <XCircle size={14}/>}
+                          {order.status}
+                        </span>
+                        {order.status !== 'PENDING' && order.updatedAt && (
+                          <span style={{ fontSize: '0.75em', color: 'var(--text-muted)' }}>
+                            {formatDateTime(order.updatedAt)}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className={styles.dateCell}>{formatDate(order.createdAt)}</td>
                     <td>
@@ -233,7 +247,7 @@ export default function OrdersTableClient({ initialOrders, adminConfig }) {
                         {order.status === 'PENDING' && (order.paymentMethod === 'SINPE' || order.paymentMethod === 'TRANSFERENCIA') && (
                           <button 
                             className={styles.actionBtn} 
-                            onClick={() => handleApprove(order.id)}
+                            onClick={() => handleApprove(order)}
                             disabled={isProcessing}
                             style={{ backgroundColor: '#10b981', color: 'white', border: 'none' }}
                           >
@@ -256,7 +270,7 @@ export default function OrdersTableClient({ initialOrders, adminConfig }) {
                         {order.status === 'APPROVED' && (
                           <button 
                             className={styles.actionBtn} 
-                            onClick={() => handleDeliver(order.id)}
+                            onClick={() => handleDeliver(order)}
                             disabled={isProcessing}
                             style={{ backgroundColor: '#f59e0b', color: 'white', border: 'none' }}
                           >
@@ -355,11 +369,7 @@ export default function OrdersTableClient({ initialOrders, adminConfig }) {
               <div className={styles.modalSection}>
                 <h3>Totales</h3>
                 <div className={styles.totalsRow}>
-                  <span>Total USD:</span>
-                  <strong>${selectedOrder.totalAmount.toFixed(2)}</strong>
-                </div>
-                <div className={styles.totalsRow}>
-                  <span>Total CRC:</span>
+                  <span>Total a Pagar:</span>
                   <strong>₡{(selectedOrder.totalAmount * (adminConfig?.exchangeRate || 515)).toLocaleString('es-CR', { maximumFractionDigits: 0 })}</strong>
                 </div>
               </div>

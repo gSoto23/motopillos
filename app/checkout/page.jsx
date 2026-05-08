@@ -6,11 +6,13 @@ import { verifyCartInventory, createOrder } from '@/app/actions/checkoutActions'
 import { getAdminConfig } from '@/app/actions/adminActions';
 import { useRouter } from 'next/navigation';
 import { CheckCircle, AlertCircle, Loader2, CreditCard, Truck } from 'lucide-react';
+import { useUI } from '@/context/UIContext';
 import styles from './Checkout.module.css';
 
 export default function CheckoutPage() {
   const { items, subtotal, removeFromCart, clearCart } = useCart();
   const router = useRouter();
+  const { showToast } = useUI();
 
   const [step, setStep] = useState('verifying'); // verifying | form | success
   const [loadingMsg, setLoadingMsg] = useState('Conectando con bodegas...');
@@ -81,13 +83,33 @@ export default function CheckoutPage() {
       .then(res => res.json())
       .then(data => {
         if (data.user) {
+          let parsedAddress = { provincia: '', canton: '', distrito: '', exacta: '' };
+          if (data.user.address) {
+            try {
+              parsedAddress = JSON.parse(data.user.address);
+            } catch(e) {
+              parsedAddress.exacta = data.user.address;
+            }
+          }
+
           setFormData(prev => ({
             ...prev,
             name: prev.name || data.user.name || '',
             email: prev.email || data.user.email || '',
+            phone: prev.phone || data.user.phone || '',
+            address: prev.address || parsedAddress.exacta || ''
           }));
-          // Si el user object original enviara phone, lo pondríamos aquí,
-          // pero el token JWT no tiene phone, podríamos pedir `/api/auth/me` mejorado en el futuro.
+
+          if (parsedAddress.provincia) setSelectedProv(parsedAddress.provincia);
+          // Canton and Distrito will be set via useEffects once Provincia loads, 
+          // but we need a way to set them after options load.
+          // For simplicity, we just set the initial values if they exist.
+          if (parsedAddress.canton) {
+            setTimeout(() => setSelectedCanton(parsedAddress.canton), 500);
+          }
+          if (parsedAddress.distrito) {
+            setTimeout(() => setSelectedDistrito(parsedAddress.distrito), 1000);
+          }
         }
       })
       .catch(() => {});
@@ -177,13 +199,13 @@ export default function CheckoutPage() {
             window.location.href = tData.url;
             return; // Exit here, let the browser redirect
           } else {
-            alert('Error generando link de pago. Por favor contacta soporte.');
+            showToast('Error generando link de pago. Por favor contacta soporte.', 'error');
             setIsSubmitting(false);
             setStep('form');
           }
         } catch (err) {
           console.error(err);
-          alert('Error conectando a Tilopay. Intenta de nuevo.');
+          showToast('Error conectando a Tilopay. Intenta de nuevo.', 'error');
           setIsSubmitting(false);
           setStep('form');
         }
@@ -194,7 +216,7 @@ export default function CheckoutPage() {
       }
     } else {
       setIsSubmitting(false);
-      alert("Hubo un error procesando tu orden. Por favor intenta de nuevo.");
+      showToast("Hubo un error procesando tu orden. Por favor intenta de nuevo.", "error");
     }
   };
 
@@ -295,7 +317,7 @@ export default function CheckoutPage() {
                       <span className={styles.itemName}>{item.name.substring(0, 30)}...</span>
                       <span className={styles.itemQty}>Cant: {item.qty}</span>
                     </div>
-                    <span className={styles.itemPrice}>${(item.price * item.qty).toFixed(2)}</span>
+                    <span className={styles.itemPrice}>₡{(item.price * exchangeRate * item.qty).toLocaleString('es-CR', { maximumFractionDigits: 0 })}</span>
                   </div>
                 ))}
               </div>
@@ -303,21 +325,20 @@ export default function CheckoutPage() {
               <div className={styles.totals}>
                 <div className={styles.totalRow}>
                   <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>₡{(subtotal * exchangeRate).toLocaleString('es-CR', { maximumFractionDigits: 0 })}</span>
                 </div>
                 <div className={styles.totalRow}>
                   <span>IVA (13%)</span>
-                  <span>${ivaAmount.toFixed(2)}</span>
+                  <span>₡{(ivaAmount * exchangeRate).toLocaleString('es-CR', { maximumFractionDigits: 0 })}</span>
                 </div>
                 <div className={styles.totalRow}>
                   <span>Envío Nacional</span>
-                  <span>${shippingCost.toFixed(2)}</span>
+                  <span>₡{(shippingCost * exchangeRate).toLocaleString('es-CR', { maximumFractionDigits: 0 })}</span>
                 </div>
                 <div className={`${styles.totalRow} ${styles.grandTotal}`}>
                   <span>Total a Pagar</span>
                   <div style={{ textAlign: 'right' }}>
-                    <div>${totalUSD.toFixed(2)} USD</div>
-                    <div style={{ fontSize: '0.85em', color: '#666', marginTop: '4px' }}>₡{totalCRC.toLocaleString('es-CR', { maximumFractionDigits: 0 })} CRC</div>
+                    <div>₡{totalCRC.toLocaleString('es-CR', { maximumFractionDigits: 0 })} CRC</div>
                   </div>
                 </div>
               </div>
@@ -363,7 +384,7 @@ export default function CheckoutPage() {
                 </div>
 
                 <button type="submit" disabled={isSubmitting} className={styles.submitBtn} style={{ width: '100%' }}>
-                  {isSubmitting ? 'Procesando...' : `Confirmar y Pagar $${totalUSD.toFixed(2)} USD / ₡${totalCRC.toLocaleString('es-CR', { maximumFractionDigits: 0 })}`}
+                  {isSubmitting ? 'Procesando...' : `Confirmar y Pagar ₡${totalCRC.toLocaleString('es-CR', { maximumFractionDigits: 0 })}`}
                 </button>
               </div>
 
