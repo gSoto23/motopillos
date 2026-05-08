@@ -11,7 +11,7 @@ import styles from './Checkout.module.css';
 export default function CheckoutPage() {
   const { items, subtotal, removeFromCart, clearCart } = useCart();
   const router = useRouter();
-  
+
   const [step, setStep] = useState('verifying'); // verifying | form | success
   const [loadingMsg, setLoadingMsg] = useState('Conectando con bodegas...');
   const [stockStatus, setStockStatus] = useState(null); // { success, outOfStockItems }
@@ -20,21 +20,21 @@ export default function CheckoutPage() {
   useEffect(() => {
     getAdminConfig().then(conf => setAdminConfig(conf));
   }, []);
-  
+
   useEffect(() => {
     if (!items || (items.length === 0 && step !== 'success')) {
       router.push('/');
       return;
     }
-    
+
     // Ejecutar validacion JIT silente
     if (step === 'verifying') {
       const runVerification = async () => {
         setLoadingMsg('Verificando disponibilidad de piezas...');
-        
+
         try {
           const result = await verifyCartInventory(items);
-          
+
           if (result.success) {
             setLoadingMsg('Inventario confirmado. Preparando checkout...');
             setTimeout(() => setStep('form'), 800);
@@ -48,7 +48,7 @@ export default function CheckoutPage() {
           setTimeout(() => setStep('form'), 1000);
         }
       };
-      
+
       runVerification();
     }
   }, [step, items, router]);
@@ -64,12 +64,34 @@ export default function CheckoutPage() {
   };
 
   const [formData, setFormData] = useState({
-    name: '', email: '', address: '', phone: '', paymentMethod: 'TARJETA'
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    paymentMethod: 'TARJETA'
   });
 
   const [provincias, setProvincias] = useState({});
   const [cantones, setCantones] = useState({});
   const [distritos, setDistritos] = useState({});
+
+  // Auto-fill if user is logged in
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(res => res.json())
+      .then(data => {
+        if (data.user) {
+          setFormData(prev => ({
+            ...prev,
+            name: prev.name || data.user.name || '',
+            email: prev.email || data.user.email || '',
+          }));
+          // Si el user object original enviara phone, lo pondríamos aquí,
+          // pero el token JWT no tiene phone, podríamos pedir `/api/auth/me` mejorado en el futuro.
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const [selectedProv, setSelectedProv] = useState('');
   const [selectedCanton, setSelectedCanton] = useState('');
@@ -114,7 +136,7 @@ export default function CheckoutPage() {
   const handleCheckoutSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     const orderData = {
       customerName: formData.name,
       customerEmail: formData.email,
@@ -126,13 +148,13 @@ export default function CheckoutPage() {
     };
 
     const result = await createOrder(orderData);
-    
+
     if (result.success) {
       if (formData.paymentMethod === 'TARJETA') {
         // Redirigir a Tilopay
         setLoadingMsg('Conectando con pasarela de pago seguro...');
         setStep('verifying'); // Re-use verification screen for loading
-        
+
         try {
           const tRes = await fetch('/api/tilopay/checkout', {
             method: 'POST',
@@ -149,7 +171,7 @@ export default function CheckoutPage() {
               phone: formData.phone
             })
           });
-          
+
           const tData = await tRes.json();
           if (tData.url) {
             window.location.href = tData.url;
@@ -217,11 +239,11 @@ export default function CheckoutPage() {
               <div className={styles.form}>
                 <div className={styles.inputGroup}>
                   <label>Nombre Completo</label>
-                  <input required type="text" placeholder="Juan Pérez" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                  <input required type="text" placeholder="Juan Pérez" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
                 </div>
                 <div className={styles.inputGroup}>
                   <label>Correo Electrónico</label>
-                  <input required type="email" placeholder="juan@ejemplo.com" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+                  <input required type="email" placeholder="juan@ejemplo.com" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} />
                 </div>
                 <div className={styles.inputGroup}>
                   <label>Provincia</label>
@@ -232,8 +254,8 @@ export default function CheckoutPage() {
                     ))}
                   </select>
                 </div>
-                <div style={{display: 'flex', gap: '10px'}}>
-                  <div className={styles.inputGroup} style={{flex: 1}}>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <div className={styles.inputGroup} style={{ flex: 1 }}>
                     <label>Cantón</label>
                     <select required value={selectedCanton} onChange={e => setSelectedCanton(e.target.value)} disabled={!selectedProv} className={styles.selectInput}>
                       <option value="">Seleccione Cantón</option>
@@ -242,7 +264,7 @@ export default function CheckoutPage() {
                       ))}
                     </select>
                   </div>
-                  <div className={styles.inputGroup} style={{flex: 1}}>
+                  <div className={styles.inputGroup} style={{ flex: 1 }}>
                     <label>Distrito</label>
                     <select required value={selectedDistrito} onChange={e => setSelectedDistrito(e.target.value)} disabled={!selectedCanton} className={styles.selectInput}>
                       <option value="">Seleccione Distrito</option>
@@ -254,13 +276,13 @@ export default function CheckoutPage() {
                 </div>
                 <div className={styles.inputGroup}>
                   <label>Dirección Exacta</label>
-                  <input required type="text" placeholder="100m norte de la iglesia..." value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} />
+                  <input required type="text" placeholder="100m norte de la iglesia..." value={formData.address} onChange={e => setFormData({ ...formData, address: e.target.value })} />
                 </div>
                 <div className={styles.inputGroup}>
                   <label>Celular</label>
-                  <input required type="tel" placeholder="8888-8888" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
+                  <input required type="tel" placeholder="8888-8888" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} />
                 </div>
-                
+
               </div>
             </div>
 
@@ -277,7 +299,7 @@ export default function CheckoutPage() {
                   </div>
                 ))}
               </div>
-              
+
               <div className={styles.totals}>
                 <div className={styles.totalRow}>
                   <span>Subtotal</span>
@@ -295,25 +317,25 @@ export default function CheckoutPage() {
                   <span>Total a Pagar</span>
                   <div style={{ textAlign: 'right' }}>
                     <div>${totalUSD.toFixed(2)} USD</div>
-                    <div style={{ fontSize: '0.85em', color: '#666', marginTop: '4px' }}>₡{totalCRC.toLocaleString('es-CR', {maximumFractionDigits: 0})} CRC</div>
+                    <div style={{ fontSize: '0.85em', color: '#666', marginTop: '4px' }}>₡{totalCRC.toLocaleString('es-CR', { maximumFractionDigits: 0 })} CRC</div>
                   </div>
                 </div>
               </div>
-              
+
               <div className={styles.paymentSectionRight} style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
                 <div className={styles.paymentMethods}>
                   <h3>Método de Pago</h3>
                   <div className={styles.radioGroup}>
                     <label className={styles.radioLabel}>
-                      <input type="radio" name="payment" value="TARJETA" checked={formData.paymentMethod === 'TARJETA'} onChange={e => setFormData({...formData, paymentMethod: e.target.value})} />
-                      Tarjeta de Crédito/Débito (Stripe/PayPal)
+                      <input type="radio" name="payment" value="TARJETA" checked={formData.paymentMethod === 'TARJETA'} onChange={e => setFormData({ ...formData, paymentMethod: e.target.value })} />
+                      Tarjeta de Crédito/Débito
                     </label>
                     <label className={styles.radioLabel}>
-                      <input type="radio" name="payment" value="SINPE" checked={formData.paymentMethod === 'SINPE'} onChange={e => setFormData({...formData, paymentMethod: e.target.value})} />
+                      <input type="radio" name="payment" value="SINPE" checked={formData.paymentMethod === 'SINPE'} onChange={e => setFormData({ ...formData, paymentMethod: e.target.value })} />
                       SINPE Móvil (Requiere Aprobación)
                     </label>
                     <label className={styles.radioLabel}>
-                      <input type="radio" name="payment" value="TRANSFERENCIA" checked={formData.paymentMethod === 'TRANSFERENCIA'} onChange={e => setFormData({...formData, paymentMethod: e.target.value})} />
+                      <input type="radio" name="payment" value="TRANSFERENCIA" checked={formData.paymentMethod === 'TRANSFERENCIA'} onChange={e => setFormData({ ...formData, paymentMethod: e.target.value })} />
                       Transferencia Bancaria (Requiere Aprobación)
                     </label>
                   </div>
@@ -334,14 +356,14 @@ export default function CheckoutPage() {
                     {formData.paymentMethod === 'TRANSFERENCIA' && (
                       <>
                         <p style={{ margin: '0 0 0.5rem 0' }}>Deposita el total en la siguiente cuenta para confirmar tu orden:</p>
-                        <p style={{ margin: 0, fontWeight: 600 }}>Cta: {adminConfig?.transferAccount} <br/>Nombre: {adminConfig?.transferName}</p>
+                        <p style={{ margin: 0, fontWeight: 600 }}>Cta: {adminConfig?.transferAccount} <br />Nombre: {adminConfig?.transferName}</p>
                       </>
                     )}
                   </div>
                 </div>
 
                 <button type="submit" disabled={isSubmitting} className={styles.submitBtn} style={{ width: '100%' }}>
-                  {isSubmitting ? 'Procesando...' : `Confirmar y Pagar $${totalUSD.toFixed(2)} USD / ₡${totalCRC.toLocaleString('es-CR', {maximumFractionDigits: 0})}`}
+                  {isSubmitting ? 'Procesando...' : `Confirmar y Pagar $${totalUSD.toFixed(2)} USD / ₡${totalCRC.toLocaleString('es-CR', { maximumFractionDigits: 0 })}`}
                 </button>
               </div>
 

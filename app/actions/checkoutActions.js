@@ -1,6 +1,14 @@
 "use server";
 import { prisma } from '@/lib/prisma';
-import { sendOrderConfirmationEmail } from '@/lib/email';
+import { sendOrderConfirmationEmail, sendWelcomeEmail } from '@/lib/email';
+import bcrypt from 'bcryptjs';
+
+function generateRandomPassword(length = 8) {
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let pass = '';
+  for (let i = 0; i < length; i++) pass += chars.charAt(Math.floor(Math.random() * chars.length));
+  return pass;
+}
 
 export async function verifyCartInventory(cartItems) {
   // Silent Server-Side JIT Verification.
@@ -41,6 +49,26 @@ export async function createOrder(orderData) {
     // All start as PENDING. TARJETA will be approved via Webhook.
     const initialStatus = 'PENDING';
 
+    let user = await prisma.user.findUnique({ where: { email: customerEmail } });
+    let newPassword = null;
+
+    if (!user) {
+      newPassword = generateRandomPassword();
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      user = await prisma.user.create({
+        data: {
+          email: customerEmail,
+          password: hashedPassword,
+          name: customerName,
+          phone: customerPhone,
+          address: shippingAddress,
+          role: 'USER'
+        }
+      });
+      // Enviar email de bienvenida de forma asíncrona
+      sendWelcomeEmail(user, newPassword).catch(err => console.error("Welcome email error:", err));
+    }
+
     const order = await prisma.order.create({
       data: {
          customerName,
@@ -50,7 +78,8 @@ export async function createOrder(orderData) {
          totalAmount,
          paymentMethod,
          status: initialStatus,
-         itemsList: JSON.stringify(itemsList)
+         itemsList: JSON.stringify(itemsList),
+         userId: user.id
       }
     });
 

@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Search, ShoppingCart, Menu, Sun, Moon, X, Loader2 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -18,6 +18,18 @@ export default function Navbar() {
   const [results, setResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [session, setSession] = useState(null);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(res => res.json())
+      .then(data => {
+        setSession(data.user || null);
+      })
+      .catch(() => setSession(null));
+  }, [pathname]);
   
   const searchRef = useRef(null);
 
@@ -54,6 +66,14 @@ export default function Navbar() {
   const handleResultClick = () => {
     setShowDropdown(false);
     setQuery('');
+  };
+
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    setSession(null);
+    setMobileMenuOpen(false);
+    router.push('/login');
+    router.refresh();
   };
 
   return (
@@ -106,7 +126,7 @@ export default function Navbar() {
           )}
         </div>
 
-        <div className={styles.navActions}>
+        <div className={styles.navActions} style={{ position: 'relative' }}>
           <button onClick={toggleTheme} className={styles.iconBtn} aria-label="Toggle Theme">
             {theme === 'light' ? <Moon size={22} /> : <Sun size={22} />}
           </button>
@@ -115,9 +135,49 @@ export default function Navbar() {
             <ShoppingCart size={24} />
             {totalItems > 0 && <span className={styles.cartBadge}>{totalItems}</span>}
           </button>
-          <Link href="/admin" aria-label="Admin Dashboard" className={styles.iconBtn}>
-            <Menu size={24} />
-          </Link>
+          
+          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className={styles.iconBtn} aria-label="Menu">
+             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+
+          {mobileMenuOpen && (
+            <div style={{ position: 'absolute', top: '100%', right: '0', background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '0.5rem', minWidth: '200px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)', zIndex: 50, marginTop: '0.5rem' }}>
+              {!session ? (
+                <Link href="/login" onClick={() => setMobileMenuOpen(false)} style={{ display: 'block', padding: '12px 16px', color: 'var(--text-primary)', textDecoration: 'none', borderRadius: '6px', fontWeight: '500' }}>
+                  Iniciar Sesión
+                </Link>
+              ) : (
+                <>
+                  <div style={{ padding: '8px 16px', borderBottom: '1px solid var(--border-color)', marginBottom: '4px' }}>
+                    <p style={{ margin: 0, fontWeight: 'bold', fontSize: '0.9rem' }}>{session.name}</p>
+                    <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>{session.email}</p>
+                  </div>
+                  
+                  <Link href="/cuenta" onClick={() => setMobileMenuOpen(false)} style={{ display: 'block', padding: '10px 16px', color: 'var(--text-primary)', textDecoration: 'none', borderRadius: '6px' }}>
+                    Mi Cuenta
+                  </Link>
+                  {(session.role === 'ADMIN' || session.role === 'MASTER_ADMIN') && (
+                    <>
+                      <Link href="/admin/orders" onClick={() => setMobileMenuOpen(false)} style={{ display: 'block', padding: '10px 16px', color: 'var(--text-primary)', textDecoration: 'none', borderRadius: '6px' }}>
+                        Control de Órdenes
+                      </Link>
+                      <Link href="/admin" onClick={() => setMobileMenuOpen(false)} style={{ display: 'block', padding: '10px 16px', color: 'var(--text-primary)', textDecoration: 'none', borderRadius: '6px' }}>
+                        Configuración Sistema
+                      </Link>
+                      {session.role === 'MASTER_ADMIN' && (
+                        <Link href="/admin/users" onClick={() => setMobileMenuOpen(false)} style={{ display: 'block', padding: '10px 16px', color: 'var(--text-primary)', textDecoration: 'none', borderRadius: '6px' }}>
+                          Gestión de Usuarios
+                        </Link>
+                      )}
+                    </>
+                  )}
+                  <button onClick={handleLogout} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 16px', color: 'var(--accent-red)', textDecoration: 'none', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', marginTop: '4px', borderTop: '1px solid var(--border-color)' }}>
+                    Cerrar Sesión
+                  </button>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </nav>
