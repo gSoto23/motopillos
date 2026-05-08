@@ -17,6 +17,9 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loadingAction, setLoadingAction] = useState(null); // id of order being processed
+  
+  const [purchasedModal, setPurchasedModal] = useState(null);
+  const [purchasedForm, setPurchasedForm] = useState({ partzillaOrderId: '', partzillaTotal: '', partzillaDeliveryDate: '' });
 
   const openModal = (order) => {
     setSelectedOrder(order);
@@ -29,26 +32,34 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
   };
 
   const handlePurchased = (order) => {
-    const shortId = order.id.split('-')[0].toUpperCase();
-    showPrompt(
-      `¿Marcar la orden #${shortId} como COMPRADA en el proveedor? Ingresa el Order ID de Partzilla o notas:`,
-      "Ej. Order #123456",
-      async (supplierDetails) => {
-        if (!supplierDetails) {
-          showToast('Debes ingresar los detalles del proveedor para continuar', 'error');
-          return;
-        }
-        setLoadingAction(order.id);
-        const res = await markOrderAsPurchased(order.id, supplierDetails);
-        if (res.success) {
-          setOrders(prev => prev.map(o => o.id === order.id ? { ...o, status: 'PURCHASED', supplierDetails } : o));
-          showToast('Orden marcada como comprada', 'success');
-        } else {
-          showToast('Error marcando como comprada: ' + res.error, 'error');
-        }
-        setLoadingAction(null);
-      }
-    );
+    setPurchasedForm({ partzillaOrderId: '', partzillaTotal: '', partzillaDeliveryDate: '' });
+    setPurchasedModal(order);
+  };
+
+  const submitPurchased = async () => {
+    if (!purchasedForm.partzillaOrderId) {
+      showToast('El Order ID es requerido', 'error');
+      return;
+    }
+    const order = purchasedModal;
+    setLoadingAction(order.id);
+    
+    const detailsObj = {
+      orderId: purchasedForm.partzillaOrderId,
+      total: purchasedForm.partzillaTotal,
+      deliveryDate: purchasedForm.partzillaDeliveryDate
+    };
+    const supplierDetailsStr = JSON.stringify(detailsObj);
+
+    const res = await markOrderAsPurchased(order.id, supplierDetailsStr);
+    if (res.success) {
+      setOrders(prev => prev.map(o => o.id === order.id ? { ...o, status: 'PURCHASED', supplierDetails: supplierDetailsStr } : o));
+      showToast('Orden marcada como comprada', 'success');
+      setPurchasedModal(null);
+    } else {
+      showToast('Error marcando como comprada: ' + res.error, 'error');
+    }
+    setLoadingAction(null);
   };
 
   const handleApprove = (order) => {
@@ -242,6 +253,9 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
                       <div style={{ fontWeight: 600 }}>
                         ₡{(order.totalAmount * (adminConfig?.exchangeRate || 515)).toLocaleString('es-CR', { maximumFractionDigits: 0 })}
                       </div>
+                      <div style={{ fontSize: '0.8em', color: 'var(--text-muted)' }}>
+                        ${order.totalAmount.toFixed(2)} USD
+                      </div>
                     </td>
                     <td>
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
@@ -257,6 +271,17 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
                             {formatDateTime(order.updatedAt)}
                           </span>
                         )}
+                        {order.supplierDetails && (() => {
+                          try {
+                            const details = JSON.parse(order.supplierDetails);
+                            return (
+                              <div style={{ fontSize: '0.75em', color: 'var(--accent-red)', marginTop: '6px', borderTop: '1px dashed var(--border-color)', paddingTop: '6px', width: '100%' }}>
+                                <div style={{ marginBottom: '2px' }}>PZ: <strong>#{details.orderId}</strong></div>
+                                {details.deliveryDate && <div>Ent: {formatDate(details.deliveryDate)}</div>}
+                              </div>
+                            );
+                          } catch(e) { return null; }
+                        })()}
                       </div>
                     </td>
                     <td className={styles.dateCell}>{formatDate(order.createdAt)}</td>
@@ -389,9 +414,21 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
                 <p><strong>Fecha:</strong> {formatDateTime(selectedOrder.createdAt)}</p>
                 <p><strong>Estado:</strong> {selectedOrder.status}</p>
                 <p><strong>Método de Pago:</strong> {selectedOrder.paymentMethod}</p>
-                {selectedOrder.supplierDetails && (
-                  <p><strong>Detalles Proveedor:</strong> {selectedOrder.supplierDetails}</p>
-                )}
+                {selectedOrder.supplierDetails && (() => {
+                  try {
+                    const details = JSON.parse(selectedOrder.supplierDetails);
+                    return (
+                      <div style={{ marginTop: '1rem', padding: '1rem', background: 'var(--bg-tertiary)', borderRadius: '8px' }}>
+                        <h4 style={{ margin: '0 0 0.5rem 0' }}>Detalles Proveedor (Partzilla)</h4>
+                        <p style={{ margin: '0 0 0.25rem 0' }}><strong>Order ID:</strong> {details.orderId}</p>
+                        <p style={{ margin: '0 0 0.25rem 0' }}><strong>Total:</strong> ${details.total}</p>
+                        <p style={{ margin: '0' }}><strong>Entrega Estimada:</strong> {details.deliveryDate}</p>
+                      </div>
+                    );
+                  } catch(e) {
+                    return <p><strong>Detalles Proveedor:</strong> {selectedOrder.supplierDetails}</p>;
+                  }
+                })()}
               </div>
 
               <div className={styles.modalSection}>
@@ -438,9 +475,116 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
 
               <div className={styles.modalSection}>
                 <h3>Totales</h3>
-                <div className={styles.totalsRow}>
-                  <span>Total a Pagar:</span>
-                  <strong>₡{(selectedOrder.totalAmount * (adminConfig?.exchangeRate || 515)).toLocaleString('es-CR', { maximumFractionDigits: 0 })}</strong>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', background: 'var(--bg-tertiary)', padding: '1rem', borderRadius: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)' }}>
+                    <span>Subtotal</span>
+                    <span>
+                      {(() => {
+                        try {
+                          const items = JSON.parse(selectedOrder.itemsList);
+                          const subtotal = items.reduce((acc, item) => acc + (item.price * item.qty), 0);
+                          return `₡${(subtotal * (adminConfig?.exchangeRate || 515)).toLocaleString('es-CR', { maximumFractionDigits: 0 })}`;
+                        } catch(e) { return '-'; }
+                      })()}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)' }}>
+                    <span>Impuestos (13%)</span>
+                    <span>
+                      {(() => {
+                        try {
+                          const items = JSON.parse(selectedOrder.itemsList);
+                          const subtotal = items.reduce((acc, item) => acc + (item.price * item.qty), 0);
+                          const taxes = subtotal * 0.13;
+                          return `₡${(taxes * (adminConfig?.exchangeRate || 515)).toLocaleString('es-CR', { maximumFractionDigits: 0 })}`;
+                        } catch(e) { return '-'; }
+                      })()}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)' }}>
+                    <span>Envío Nacional</span>
+                    <span>
+                      {(() => {
+                        try {
+                          const items = JSON.parse(selectedOrder.itemsList);
+                          const subtotal = items.reduce((acc, item) => acc + (item.price * item.qty), 0);
+                          const taxes = subtotal * 0.13;
+                          const shipping = selectedOrder.totalAmount - subtotal - taxes;
+                          return `₡${(Math.max(0, shipping) * (adminConfig?.exchangeRate || 515)).toLocaleString('es-CR', { maximumFractionDigits: 0 })}`;
+                        } catch(e) { return '-'; }
+                      })()}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)' }}>
+                    <span style={{ fontWeight: 600 }}>Total a Pagar:</span>
+                    <div style={{ textAlign: 'right' }}>
+                      <strong style={{ fontSize: '1.2rem', color: 'var(--accent-red)' }}>
+                        ₡{(selectedOrder.totalAmount * (adminConfig?.exchangeRate || 515)).toLocaleString('es-CR', { maximumFractionDigits: 0 })}
+                      </strong>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                        ${selectedOrder.totalAmount.toFixed(2)} USD
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {purchasedModal && (
+        <div className={styles.modalOverlay} onClick={() => setPurchasedModal(null)}>
+          <div className={styles.modalContent} onClick={e => e.stopPropagation()} style={{ maxWidth: '400px' }}>
+            <div className={styles.modalHeader}>
+              <h2 style={{ fontSize: '1.25rem' }}>Compra en Proveedor</h2>
+              <button onClick={() => setPurchasedModal(null)} className={styles.closeBtn}><X size={24} /></button>
+            </div>
+            <div className={styles.modalBody}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div>
+                  <label style={{ fontSize: '0.9rem', fontWeight: 500, display: 'block', marginBottom: '0.4rem', color: 'var(--text-secondary)' }}>Order ID (Partzilla)</label>
+                  <input 
+                    type="text" 
+                    placeholder="Ej. 12345678"
+                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: '1rem', outline: 'none' }} 
+                    value={purchasedForm.partzillaOrderId} 
+                    onChange={e => setPurchasedForm({...purchasedForm, partzillaOrderId: e.target.value})} 
+                  />
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.9rem', fontWeight: 500, display: 'block', marginBottom: '0.4rem', color: 'var(--text-secondary)' }}>Total (Partzilla USD)</label>
+                  <input 
+                    type="number" 
+                    step="0.01" 
+                    placeholder="Ej. 125.50"
+                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: '1rem', outline: 'none' }} 
+                    value={purchasedForm.partzillaTotal} 
+                    onChange={e => setPurchasedForm({...purchasedForm, partzillaTotal: e.target.value})} 
+                  />
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.9rem', fontWeight: 500, display: 'block', marginBottom: '0.4rem', color: 'var(--text-secondary)' }}>Fecha Estimada de Entrega</label>
+                  <input 
+                    type="date" 
+                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: '1rem', outline: 'none' }} 
+                    value={purchasedForm.partzillaDeliveryDate} 
+                    onChange={e => setPurchasedForm({...purchasedForm, partzillaDeliveryDate: e.target.value})} 
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '1rem', borderTop: '1px solid var(--border-color)', paddingTop: '1.5rem' }}>
+                  <button 
+                    onClick={() => setPurchasedModal(null)}
+                    style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-tertiary)', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 500 }}
+                  >
+                    Cancelar
+                  </button>
+                  <button 
+                    onClick={submitPurchased}
+                    disabled={loadingAction === purchasedModal.id}
+                    style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', border: 'none', background: 'var(--accent-red)', color: 'white', cursor: 'pointer', fontWeight: 500, opacity: loadingAction === purchasedModal.id ? 0.7 : 1 }}
+                  >
+                    {loadingAction === purchasedModal.id ? 'Guardando...' : 'Guardar y Marcar'}
+                  </button>
                 </div>
               </div>
             </div>

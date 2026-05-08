@@ -2,16 +2,16 @@
 
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
-import { sendOrderConfirmationEmail } from '@/lib/email';
+import { sendOrderConfirmationEmail, sendOrderStatusEmail } from '@/lib/email';
 
 export async function updateOrderStatus(orderId, newStatus) {
   try {
-    await prisma.order.update({
+    const updatedOrder = await prisma.order.update({
       where: { id: orderId },
       data: { status: newStatus }
     });
     
-    // Si quisieras enviar un email de "Orden Enviada" o similar, podrías hacerlo aquí
+    sendOrderStatusEmail(updatedOrder).catch(err => console.error("Status Email error:", err));
     
     revalidatePath('/admin/orders');
     return { success: true };
@@ -23,7 +23,7 @@ export async function updateOrderStatus(orderId, newStatus) {
 
 export async function markOrderAsPurchased(orderId, supplierDetails) {
   try {
-    await prisma.order.update({
+    const updatedOrder = await prisma.order.update({
       where: { id: orderId },
       data: { 
         status: 'PURCHASED',
