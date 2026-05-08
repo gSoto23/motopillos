@@ -21,6 +21,24 @@ export async function updateOrderStatus(orderId, newStatus) {
   }
 }
 
+export async function markOrderAsPurchased(orderId, supplierDetails) {
+  try {
+    await prisma.order.update({
+      where: { id: orderId },
+      data: { 
+        status: 'PURCHASED',
+        supplierDetails: supplierDetails
+      }
+    });
+    
+    revalidatePath('/admin/orders');
+    return { success: true };
+  } catch (error) {
+    console.error("Error marking order as purchased:", error);
+    return { success: false, error: error.message };
+  }
+}
+
 export async function syncTilopayOrder(orderId) {
   try {
     const authPayload = {

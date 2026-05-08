@@ -12,7 +12,7 @@ export const useUI = () => {
 
 export const UIProvider = ({ children }) => {
   const [toast, setToast] = useState(null); // { message, type: 'success' | 'error' | 'info' }
-  const [confirmState, setConfirmState] = useState(null); // { message, onConfirm, onCancel }
+  const [confirmState, setConfirmState] = useState(null); // { message, onConfirm, onCancel, isPrompt, promptValue, placeholder }
 
   const showToast = useCallback((message, type = 'info') => {
     setToast({ message, type });
@@ -22,7 +22,11 @@ export const UIProvider = ({ children }) => {
   }, []);
 
   const showConfirm = useCallback((message, onConfirm, onCancel = () => {}) => {
-    setConfirmState({ message, onConfirm, onCancel });
+    setConfirmState({ message, onConfirm, onCancel, isPrompt: false });
+  }, []);
+
+  const showPrompt = useCallback((message, placeholder, onConfirm, onCancel = () => {}) => {
+    setConfirmState({ message, placeholder, onConfirm, onCancel, isPrompt: true, promptValue: '' });
   }, []);
 
   const closeConfirm = useCallback(() => {
@@ -30,7 +34,7 @@ export const UIProvider = ({ children }) => {
   }, []);
 
   return (
-    <UIContext.Provider value={{ showToast, showConfirm }}>
+    <UIContext.Provider value={{ showToast, showConfirm, showPrompt }}>
       {children}
 
       {/* Toast Notification */}
@@ -88,9 +92,28 @@ export const UIProvider = ({ children }) => {
               <AlertCircle color="var(--accent-red)" size={28} />
               <h3 style={{ margin: 0, fontSize: '1.25rem', color: 'var(--text-primary)' }}>Confirmar Acción</h3>
             </div>
-            <p style={{ color: 'var(--text-secondary)', lineHeight: '1.5', marginBottom: '32px', fontSize: '1rem' }}>
+            <p style={{ color: 'var(--text-secondary)', lineHeight: '1.5', marginBottom: confirmState.isPrompt ? '16px' : '32px', fontSize: '1rem' }}>
               {confirmState.message}
             </p>
+            {confirmState.isPrompt && (
+              <input
+                type="text"
+                autoFocus
+                placeholder={confirmState.placeholder || 'Escribe aquí...'}
+                value={confirmState.promptValue || ''}
+                onChange={(e) => setConfirmState(prev => ({ ...prev, promptValue: e.target.value }))}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  border: '1px solid var(--border-color)',
+                  background: 'var(--bg-primary)',
+                  color: 'var(--text-primary)',
+                  marginBottom: '32px',
+                  fontSize: '1rem'
+                }}
+              />
+            )}
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
               <button 
                 onClick={() => {
@@ -111,7 +134,11 @@ export const UIProvider = ({ children }) => {
               </button>
               <button 
                 onClick={() => {
-                  confirmState.onConfirm();
+                  if (confirmState.isPrompt) {
+                    confirmState.onConfirm(confirmState.promptValue);
+                  } else {
+                    confirmState.onConfirm();
+                  }
                   closeConfirm();
                 }}
                 style={{

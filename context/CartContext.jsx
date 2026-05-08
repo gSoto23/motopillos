@@ -26,22 +26,23 @@ export function CartProvider({ children }) {
 
   const addToCart = (part, qty = 1) => {
     setItems((prev) => {
-      const existing = prev.find(i => i.partNo === part.partNo);
+      const incomingSku = part.partNumber || part.partNo;
+      const existing = prev.find(i => (i.partNumber || i.partNo) === incomingSku);
       if (existing) {
-        return prev.map(i => i.partNo === part.partNo ? { ...i, qty: i.qty + qty } : i);
+        return prev.map(i => (i.partNumber || i.partNo) === incomingSku ? { ...i, qty: i.qty + qty } : i);
       }
       return [...prev, { ...part, qty }];
     });
     setIsOpen(true);
   };
 
-  const removeFromCart = (partNo) => {
-    setItems((prev) => prev.filter(i => i.partNo !== partNo));
+  const removeFromCart = (sku) => {
+    setItems((prev) => prev.filter(i => (i.partNumber || i.partNo) !== sku));
   };
 
-  const updateQty = (partNo, qty) => {
+  const updateQty = (sku, qty) => {
     if (qty < 1) return;
-    setItems((prev) => prev.map(i => i.partNo === partNo ? { ...i, qty } : i));
+    setItems((prev) => prev.map(i => (i.partNumber || i.partNo) === sku ? { ...i, qty } : i));
   };
 
   const clearCart = () => {

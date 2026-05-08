@@ -96,6 +96,7 @@ model Order {
   paymentMethod   String   
   status          String   @default("PENDING")
   itemsList       String   
+  supplierDetails String?  // Stores Partzilla order ID or other supplier info
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   userId          String?

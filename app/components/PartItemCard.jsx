@@ -23,7 +23,7 @@ export default function PartItemCard({ part, finalPriceUSD, finalPriceCRC, vehic
   const handleAddToCart = () => {
     if (!isAvailable) return;
     addToCart({
-      partNo: part.sku,
+      partNumber: part.sku,
       name: part.name,
       price: finalPriceUSD,
       priceCRC: finalPriceCRC,

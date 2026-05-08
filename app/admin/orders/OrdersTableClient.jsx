@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from 'react';
-import { CheckCircle, Clock, XCircle, Search, RefreshCw, MessageCircle, PackageCheck, Eye, X, ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { CheckCircle, Clock, XCircle, Search, RefreshCw, MessageCircle, PackageCheck, Eye, X, ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown, ShoppingCart, Copy } from 'lucide-react';
 import styles from '../AdminDashboard.module.css';
-import { updateOrderStatus, syncTilopayOrder } from '@/app/actions/orderAdminActions';
+import { updateOrderStatus, syncTilopayOrder, markOrderAsPurchased } from '@/app/actions/orderAdminActions';
 import { useUI } from '@/context/UIContext';
 
-export default function OrdersTableClient({ initialOrders, adminConfig }) {
-  const { showToast, showConfirm } = useUI();
+export default function OrdersTableClient({ initialOrders, adminConfig, userRole }) {
+  const { showToast, showConfirm, showPrompt } = useUI();
   const [orders, setOrders] = useState(initialOrders);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
@@ -26,6 +26,29 @@ export default function OrdersTableClient({ initialOrders, adminConfig }) {
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedOrder(null);
+  };
+
+  const handlePurchased = (order) => {
+    const shortId = order.id.split('-')[0].toUpperCase();
+    showPrompt(
+      `¿Marcar la orden #${shortId} como COMPRADA en el proveedor? Ingresa el Order ID de Partzilla o notas:`,
+      "Ej. Order #123456",
+      async (supplierDetails) => {
+        if (!supplierDetails) {
+          showToast('Debes ingresar los detalles del proveedor para continuar', 'error');
+          return;
+        }
+        setLoadingAction(order.id);
+        const res = await markOrderAsPurchased(order.id, supplierDetails);
+        if (res.success) {
+          setOrders(prev => prev.map(o => o.id === order.id ? { ...o, status: 'PURCHASED', supplierDetails } : o));
+          showToast('Orden marcada como comprada', 'success');
+        } else {
+          showToast('Error marcando como comprada: ' + res.error, 'error');
+        }
+        setLoadingAction(null);
+      }
+    );
   };
 
   const handleApprove = (order) => {
@@ -72,6 +95,22 @@ export default function OrdersTableClient({ initialOrders, adminConfig }) {
       showToast('Error sincronizando con Tilopay: ' + res.error, 'error');
     }
     setLoadingAction(null);
+  };
+
+  const copyAllSkus = () => {
+    if (!selectedOrder) return;
+    try {
+      const items = JSON.parse(selectedOrder.itemsList);
+      const skus = items.map(item => item.partNumber || item.partNo).filter(Boolean).join('\n');
+      if (skus) {
+        navigator.clipboard.writeText(skus);
+        showToast('SKUs copiados al portapapeles', 'success');
+      } else {
+        showToast('No hay SKUs para copiar en esta orden', 'error');
+      }
+    } catch (e) {
+      showToast('Error leyendo items', 'error');
+    }
   };
 
   const formatPhoneForWA = (phone) => {
@@ -208,6 +247,7 @@ export default function OrdersTableClient({ initialOrders, adminConfig }) {
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
                         <span className={`${styles.statusBadge} ${styles[order.status.toLowerCase()] || ''}`}>
                           {order.status === 'APPROVED' ? <CheckCircle size={14}/> : 
+                           order.status === 'PURCHASED' ? <ShoppingCart size={14}/> : 
                            order.status === 'DELIVERED' ? <PackageCheck size={14}/> : 
                            order.status === 'PENDING' ? <Clock size={14}/> : <XCircle size={14}/>}
                           {order.status}
@@ -267,7 +307,19 @@ export default function OrdersTableClient({ initialOrders, adminConfig }) {
                           </button>
                         )}
 
-                        {order.status === 'APPROVED' && (
+                        {order.status === 'APPROVED' && userRole === 'MASTER_ADMIN' && (
+                          <button 
+                            className={styles.actionBtn} 
+                            onClick={() => handlePurchased(order)}
+                            disabled={isProcessing}
+                            style={{ backgroundColor: '#8b5cf6', color: 'white', border: 'none' }}
+                            title="Comprado en Proveedor"
+                          >
+                            Comprado
+                          </button>
+                        )}
+
+                        {(order.status === 'APPROVED' || order.status === 'PURCHASED') && (
                           <button 
                             className={styles.actionBtn} 
                             onClick={() => handleDeliver(order)}
@@ -337,6 +389,9 @@ export default function OrdersTableClient({ initialOrders, adminConfig }) {
                 <p><strong>Fecha:</strong> {formatDateTime(selectedOrder.createdAt)}</p>
                 <p><strong>Estado:</strong> {selectedOrder.status}</p>
                 <p><strong>Método de Pago:</strong> {selectedOrder.paymentMethod}</p>
+                {selectedOrder.supplierDetails && (
+                  <p><strong>Detalles Proveedor:</strong> {selectedOrder.supplierDetails}</p>
+                )}
               </div>
 
               <div className={styles.modalSection}>
@@ -348,14 +403,29 @@ export default function OrdersTableClient({ initialOrders, adminConfig }) {
               </div>
 
               <div className={styles.modalSection}>
-                <h3>Items Comprados</h3>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                  <h3 style={{ margin: 0 }}>Items Comprados</h3>
+                  <button 
+                    onClick={copyAllSkus}
+                    style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', padding: '6px 12px', borderRadius: '6px', color: 'var(--text-primary)', cursor: 'pointer', fontSize: '0.85rem' }}
+                  >
+                    <Copy size={14} /> Copiar SKUs
+                  </button>
+                </div>
                 <ul className={styles.itemList}>
                   {(() => {
                     try {
                       const items = JSON.parse(selectedOrder.itemsList);
                       return items.map((item, i) => (
                         <li key={i} className={styles.itemRow}>
-                          <span>{item.qty}x {item.name}</span>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                            <span>{item.qty}x {item.name}</span>
+                            {(item.partNumber || item.partNo) && (
+                              <span style={{ fontSize: '0.8em', fontFamily: 'monospace', color: 'var(--text-secondary)' }}>
+                                SKU: {item.partNumber || item.partNo}
+                              </span>
+                            )}
+                          </div>
                           <span>${(item.price * item.qty).toFixed(2)}</span>
                         </li>
                       ));

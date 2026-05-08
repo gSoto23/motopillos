@@ -2,6 +2,10 @@
 import { prisma } from '@/lib/prisma';
 import { sendOrderConfirmationEmail, sendWelcomeEmail } from '@/lib/email';
 import bcrypt from 'bcryptjs';
+import { exec } from 'child_process';
+import util from 'util';
+
+const execPromise = util.promisify(exec);
 
 function generateRandomPassword(length = 8) {
   const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -11,25 +15,88 @@ function generateRandomPassword(length = 8) {
 }
 
 export async function verifyCartInventory(cartItems) {
-  // Silent Server-Side JIT Verification.
-  // The user sees a standard loading spinner, while we secretly ping our supplier.
+  const normalizedCartItems = cartItems.map(item => ({
+    ...item,
+    partNumber: item.partNumber || item.partNo
+  }));
   
-  // Simulated delay for the supplier ping (e.g. Playwright or HTTP request)
-  await new Promise(resolve => setTimeout(resolve, 2500));
+  const skusData = normalizedCartItems.map(item => {
+    let brand = null;
+    if (item.meta && typeof item.meta === 'string') {
+      const firstWord = item.meta.split(' ')[0].toLowerCase();
+      const knownBrands = ['yamaha', 'honda', 'kawasaki', 'suzuki', 'polaris', 'arctic-cat', 'can-am', 'sea-doo', 'ski-doo', 'harley-davidson'];
+      if (knownBrands.includes(firstWord)) {
+        brand = firstWord;
+      }
+    }
+    return {
+      sku: item.partNumber,
+      brand: brand
+    };
+  }).filter(i => i.sku);
+  
+  const skus = skusData.map(i => i.sku);
   
   const validatedItems = [];
   const outOfStockItems = [];
-  
-  // For the MVP demo, we will approve everything except occasionally rejecting
-  // if an item partNumber ends exactly with '999' (dummy trigger).
-  // Everything else is approved to keep the checkout smooth.
-  
-  for (const item of cartItems) {
-    if (item.partNumber && item.partNumber.endsWith('999')) {
-      outOfStockItems.push(item);
-    } else {
-      validatedItems.push(item);
+
+  if (skus.length === 0) {
+    return { success: true, validatedItems: normalizedCartItems, outOfStockItems: [] };
+  }
+
+  try {
+    // Determine python executable based on environment (local venv vs production)
+    const pythonPath = process.env.NODE_ENV === 'production' ? 'python3' : './venv/bin/python3';
+    
+    // Maintain the '999' dummy trigger for frontend testing without hitting the scraper
+    const dummyOos = normalizedCartItems.filter(i => i.partNumber && i.partNumber.endsWith('999'));
+    if (dummyOos.length > 0) {
+      dummyOos.forEach(item => outOfStockItems.push(item));
+      normalizedCartItems.forEach(item => {
+        if (!item.partNumber || !item.partNumber.endsWith('999')) {
+          validatedItems.push(item);
+        }
+      });
+      return {
+        success: false,
+        validatedItems,
+        outOfStockItems,
+        message: "Algunas piezas ya no están disponibles en bodega."
+      };
     }
+
+    // Escape JSON string for bash command line
+    const jsonSkus = JSON.stringify(skusData).replace(/'/g, "'\\''");
+    
+    const { stdout } = await execPromise(`${pythonPath} scraper/verify_cart_bulk.py '${jsonSkus}'`);
+    const response = JSON.parse(stdout);
+    
+    if (response.success && response.results) {
+      for (const item of normalizedCartItems) {
+        if (!item.partNumber) {
+           validatedItems.push(item);
+           continue;
+        }
+        const isAvailable = response.results[item.partNumber];
+        if (isAvailable) {
+          validatedItems.push(item);
+        } else {
+          outOfStockItems.push(item);
+        }
+      }
+    } else {
+      throw new Error(response.error || "Unknown python script error");
+    }
+
+  } catch (error) {
+    console.error("JIT Verification Error:", error);
+    // Failsafe: Si falla el scraping (bloqueo, timeout), aprobamos para no perder la venta en el MVP.
+    return {
+      success: true,
+      validatedItems: normalizedCartItems,
+      outOfStockItems: [],
+      message: "Inventario confirmado (failsafe)."
+    };
   }
   
   return {

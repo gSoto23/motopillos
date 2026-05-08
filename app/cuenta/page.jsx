@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import { verifySessionToken } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { redirect } from 'next/navigation';
-import { Package, MapPin, Phone, Mail, User, Clock, CheckCircle, PackageCheck, XCircle } from 'lucide-react';
+import { Package, MapPin, Phone, Mail, User, Clock, CheckCircle, PackageCheck, XCircle, ShoppingCart } from 'lucide-react';
 import ProfileEditor from './ProfileEditor';
 
 export default async function CuentaPage() {
@@ -30,6 +30,7 @@ export default async function CuentaPage() {
   const getStatusBadge = (status) => {
     switch(status) {
       case 'APPROVED': return <span style={{ padding: '4px 10px', borderRadius: '12px', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}><CheckCircle size={14}/> APROBADO</span>;
+      case 'PURCHASED': return <span style={{ padding: '4px 10px', borderRadius: '12px', background: 'rgba(139, 92, 246, 0.15)', color: '#8b5cf6', display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}><ShoppingCart size={14}/> PROCESANDO</span>;
       case 'DELIVERED': return <span style={{ padding: '4px 10px', borderRadius: '12px', background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6', display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}><PackageCheck size={14}/> ENTREGADO</span>;
       case 'PENDING': return <span style={{ padding: '4px 10px', borderRadius: '12px', background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b', display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}><Clock size={14}/> PENDIENTE</span>;
       default: return <span style={{ padding: '4px 10px', borderRadius: '12px', background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', fontWeight: 'bold' }}><XCircle size={14}/> CANCELADO</span>;

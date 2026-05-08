@@ -4,10 +4,17 @@ import styles from '../AdminDashboard.module.css';
 import { prisma } from '@/lib/prisma';
 import { getAdminConfig } from '@/app/actions/adminActions';
 import OrdersTableClient from './OrdersTableClient';
+import { cookies } from 'next/headers';
+import { verifySessionToken } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 export default async function OrdersDashboard() {
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get('motopillos_session')?.value;
+  const session = sessionToken ? await verifySessionToken(sessionToken) : null;
+  const userRole = session?.role || 'ADMIN';
+
   const orders = await prisma.order.findMany({
     orderBy: { createdAt: 'desc' }
   });
@@ -37,7 +44,7 @@ export default async function OrdersDashboard() {
           <p>Supervisa las compras realizadas y aprueba manualmente los pagos por transferencia o SINPE.</p>
         </header>
 
-        <OrdersTableClient initialOrders={orders} adminConfig={adminConfig} />
+        <OrdersTableClient initialOrders={orders} adminConfig={adminConfig} userRole={userRole} />
       </main>
     </div>
   );

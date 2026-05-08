@@ -36,18 +36,20 @@ export default function CartDrawer() {
               <span>El diseño de tu modelo te espera.</span>
             </div>
           ) : (
-            items.map(item => (
-              <div key={item.partNo} className={styles.cartItem}>
+            items.map(item => {
+              const sku = item.partNumber || item.partNo;
+              return (
+              <div key={sku} className={styles.cartItem}>
                 <div className={styles.itemRow}>
                   <span className={styles.itemRef}>Ref #{item.ref}</span>
-                  <button onClick={() => removeFromCart(item.partNo)} className={styles.removeBtn}>
+                  <button onClick={() => removeFromCart(sku)} className={styles.removeBtn}>
                     <Trash2 size={16} />
                   </button>
                 </div>
                 
                 <h4 className={styles.itemName}>{item.name}</h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem', marginBottom: '1rem' }}>
-                  <span className={styles.itemPartNo}>OEM: {item.partNo}</span>
+                  <span className={styles.itemPartNo}>OEM: {sku}</span>
                   {item.meta && (
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
                       {item.meta}
@@ -57,9 +59,9 @@ export default function CartDrawer() {
                 
                 <div className={styles.itemFooter}>
                   <div className={styles.qtyControl}>
-                    <button onClick={() => updateQty(item.partNo, item.qty - 1)}>-</button>
+                    <button onClick={() => updateQty(sku, item.qty - 1)}>-</button>
                     <span>{item.qty}</span>
-                    <button onClick={() => updateQty(item.partNo, item.qty + 1)}>+</button>
+                    <button onClick={() => updateQty(sku, item.qty + 1)}>+</button>
                   </div>
                   <div className={styles.itemPrice} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', lineHeight: '1.2' }}>
                     <span style={{ color: 'var(--price-color)', fontSize: '1.1rem', fontWeight: 'bold' }}>
@@ -71,7 +73,8 @@ export default function CartDrawer() {
                   </div>
                 </div>
               </div>
-            ))
+              );
+            })
           )}
         </div>
 

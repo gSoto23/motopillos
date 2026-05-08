@@ -328,7 +328,7 @@ export default function CheckoutPage() {
                   <span>₡{(subtotal * exchangeRate).toLocaleString('es-CR', { maximumFractionDigits: 0 })}</span>
                 </div>
                 <div className={styles.totalRow}>
-                  <span>IVA (13%)</span>
+                  <span>Impuestos</span>
                   <span>₡{(ivaAmount * exchangeRate).toLocaleString('es-CR', { maximumFractionDigits: 0 })}</span>
                 </div>
                 <div className={styles.totalRow}>
