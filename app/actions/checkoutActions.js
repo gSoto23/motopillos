@@ -1,6 +1,6 @@
 "use server";
 import { prisma } from '@/lib/prisma';
-import { sendOrderConfirmationEmail, sendWelcomeEmail } from '@/lib/email';
+import { sendOrderConfirmationEmail, sendWelcomeEmail, sendAdminNewOrderEmail } from '@/lib/email';
 import bcrypt from 'bcryptjs';
 import { exec } from 'child_process';
 import util from 'util';
@@ -156,9 +156,25 @@ export async function createOrder(orderData) {
       sendOrderConfirmationEmail(order).catch(err => console.error("Email error:", err));
     }
 
+    // Send admin notification
+    sendAdminNewOrderEmail(order).catch(err => console.error("Admin Email error:", err));
+
     return { success: true, orderId: order.id };
   } catch (error) {
     console.error('Error creating order:', error);
     return { success: false, error: 'Failed to create order in database.' };
+  }
+}
+
+export async function cancelOrder(orderId) {
+  try {
+    await prisma.order.update({
+      where: { id: orderId },
+      data: { status: 'CANCELLED' }
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Error cancelling order:", error);
+    return { success: false, error: error.message };
   }
 }

@@ -28,7 +28,8 @@
   justify-content: center;
 }
 
-.verificationCard, .successCard {
+.verificationCard,
+.successCard {
   background: rgba(24, 24, 27, 0.7);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 16px;
@@ -40,7 +41,9 @@
 }
 
 @keyframes spin {
-  100% { transform: rotate(360deg); }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .spinner {
@@ -59,12 +62,14 @@
   margin-bottom: 1.5rem;
 }
 
-.verificationCard h2, .successCard h2 {
+.verificationCard h2,
+.successCard h2 {
   font-size: 1.5rem;
   margin-bottom: 1rem;
 }
 
-.verificationCard p, .successCard p {
+.verificationCard p,
+.successCard p {
   color: #a1a1aa;
   line-height: 1.6;
   margin-bottom: 2rem;
@@ -120,7 +125,8 @@
   width: 100%;
 }
 
-.formSection, .orderSummary {
+.formSection,
+.orderSummary {
   background: rgba(24, 24, 27, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 16px;
@@ -128,7 +134,8 @@
   backdrop-filter: blur(10px);
 }
 
-.formSection h2, .orderSummary h2 {
+.formSection h2,
+.orderSummary h2 {
   font-size: 1.25rem;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
@@ -152,7 +159,8 @@
   color: #a1a1aa;
 }
 
-.inputGroup input, .selectInput {
+.inputGroup input,
+.selectInput {
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 0.875rem 1rem;
@@ -186,7 +194,8 @@
   color: white;
 }
 
-.inputGroup input:focus, .selectInput:focus {
+.inputGroup input:focus,
+.selectInput:focus {
   border-color: #3b82f6;
 }
 
@@ -308,9 +317,9 @@
 }
 
 /* Light Mode Overrides */
-:global([data-theme="light"]) .verificationCard, 
+:global([data-theme="light"]) .verificationCard,
 :global([data-theme="light"]) .successCard,
-:global([data-theme="light"]) .formSection, 
+:global([data-theme="light"]) .formSection,
 :global([data-theme="light"]) .orderSummary {
   background: var(--bg-secondary);
   border-color: var(--glass-border);

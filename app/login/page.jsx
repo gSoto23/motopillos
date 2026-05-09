@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Lock, Mail } from 'lucide-react';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -91,6 +92,11 @@ export default function LoginPage() {
                 placeholder="••••••••"
                 style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.5rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
               />
+            </div>
+            <div style={{ textAlign: 'right', marginTop: '0.5rem' }}>
+              <Link href="/recuperar-contrasena" style={{ fontSize: '0.85rem', color: 'var(--accent-red)', textDecoration: 'none' }}>
+                ¿Olvidaste tu contraseña?
+              </Link>
             </div>
           </div>
           

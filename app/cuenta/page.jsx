@@ -1,8 +1,9 @@
 import { cookies } from 'next/headers';
 import { verifySessionToken } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { Package, MapPin, Phone, Mail, User, Clock, CheckCircle, PackageCheck, XCircle, ShoppingCart } from 'lucide-react';
+import { User, Package } from 'lucide-react';
 import ProfileEditor from './ProfileEditor';
+import ChangePassword from './ChangePassword';
 import OrderHistoryClient from './OrderHistoryClient';
 import { getAdminConfig } from '@/app/actions/adminActions';
 
@@ -45,8 +46,8 @@ export default async function CuentaPage() {
             <User size={20} color="var(--accent-red)" />
             Datos Personales
           </h2>
-          
           <ProfileEditor user={user} />
+          <ChangePassword />
         </div>
 
         {/* Order History Section */}

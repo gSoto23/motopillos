@@ -175,7 +175,7 @@ export default function CheckoutPage() {
       if (formData.paymentMethod === 'TARJETA') {
         // Redirigir a Tilopay
         setLoadingMsg('Conectando con pasarela de pago seguro...');
-        setStep('verifying'); // Re-use verification screen for loading
+        setStep('redirecting');
 
         try {
           const tRes = await fetch('/api/tilopay/checkout', {
@@ -228,11 +228,11 @@ export default function CheckoutPage() {
       </div>
 
       <div className={styles.content}>
-        {step === 'verifying' && !stockStatus && (
+        {(step === 'verifying' || step === 'redirecting') && !stockStatus && (
           <div className={styles.verificationCard}>
             <Loader2 className={styles.spinner} size={48} />
             <h2>{loadingMsg}</h2>
-            <p>Por favor espera un momento mientras reservamos tu orden en el sistema.</p>
+            <p>{step === 'redirecting' ? 'Por favor no cierres esta ventana, serás redirigido a Tilopay en unos segundos...' : 'Por favor espera un momento mientras reservamos tu orden en el sistema.'}</p>
           </div>
         )}
 

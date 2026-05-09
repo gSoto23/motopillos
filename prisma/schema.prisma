@@ -67,9 +67,11 @@ model User {
   name      String
   role      String   @default("USER") // USER, ADMIN, MASTER_ADMIN
   phone     String?
-  address   String?
-  orders    Order[]
-  createdAt DateTime @default(now())
+  address          String?
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  orders           Order[]
+  createdAt        DateTime @default(now())
 }
 
 // Modelos de Comercio Frontend Originals
