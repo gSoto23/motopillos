@@ -62,7 +62,6 @@ scraper/venv/
 # Playwright
 *.zip
 *.webm
-*.png
 test-results/
 
 # IDE Configuration
