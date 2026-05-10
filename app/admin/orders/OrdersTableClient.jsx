@@ -13,11 +13,11 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
   const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  
+
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loadingAction, setLoadingAction] = useState(null); // id of order being processed
-  
+
   const [purchasedModal, setPurchasedModal] = useState(null);
   const [purchasedForm, setPurchasedForm] = useState({ partzillaOrderId: '', partzillaTotal: '', partzillaDeliveryDate: '' });
 
@@ -43,7 +43,7 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
     }
     const order = purchasedModal;
     setLoadingAction(order.id);
-    
+
     const detailsObj = {
       orderId: purchasedForm.partzillaOrderId,
       total: purchasedForm.partzillaTotal,
@@ -146,7 +146,7 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
   const getWhatsAppMessage = (order) => {
     if (order.status === 'PENDING') {
       const amountCRC = (order.totalAmount * (adminConfig?.exchangeRate || 515)).toLocaleString('es-CR', { maximumFractionDigits: 0 });
-      const accountInfo = order.paymentMethod === 'SINPE' ? 'al teléfono 8888-8888' : 'a la cuenta CR12015201001234567890';
+      const accountInfo = order.paymentMethod === 'SINPE' ? 'al teléfono 7097-3376' : 'a la cuenta CR66010200009691875099 a nombre de Eddyn Gerardo Soto Arguedas';
       return `Hola ${order.customerName}, gracias por tu compra en Motopillos (Orden #${order.id.split('-')[0].toUpperCase()}). Para proceder con el envío, por favor realiza el depósito por ₡${amountCRC} ${accountInfo} y adjunta por este medio el comprobante de pago.`;
     } else {
       return `Hola ${order.customerName}, te contactamos de Motopillos referente a tu orden #${order.id.split('-')[0].toUpperCase()}.`;
@@ -163,7 +163,7 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
 
   const getSortIcon = (key) => {
     if (sortConfig.key !== key) return <ArrowUpDown size={14} className={styles.sortIcon} />;
-    return sortConfig.direction === 'asc' 
+    return sortConfig.direction === 'asc'
       ? <ArrowUp size={14} className={`${styles.sortIcon} ${styles.active}`} />
       : <ArrowDown size={14} className={`${styles.sortIcon} ${styles.active}`} />;
   };
@@ -171,13 +171,13 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
   const sortedOrders = [...orders].sort((a, b) => {
     let valA = a[sortConfig.key];
     let valB = b[sortConfig.key];
-    
+
     // Custom sort parsing if necessary (e.g. string vs date)
     if (sortConfig.key === 'createdAt') {
       valA = new Date(valA).getTime();
       valB = new Date(valB).getTime();
     }
-    
+
     if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
     if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
     return 0;
@@ -187,7 +187,7 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
     const searchLower = searchTerm.toLowerCase();
     const dateStr = formatDate(o.createdAt);
     return (
-      o.customerName.toLowerCase().includes(searchLower) || 
+      o.customerName.toLowerCase().includes(searchLower) ||
       o.id.toLowerCase().includes(searchLower) ||
       (o.customerPhone && o.customerPhone.toLowerCase().includes(searchLower)) ||
       (o.status && o.status.toLowerCase().includes(searchLower)) ||
@@ -207,9 +207,9 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
     <>
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
         <div style={{ position: 'relative' }}>
-          <input 
-            type="text" 
-            placeholder="Buscar por orden, cliente, teléfono, estado, fecha..." 
+          <input
+            type="text"
+            placeholder="Buscar por orden, cliente, teléfono, estado, fecha..."
             value={searchTerm}
             onChange={handleSearchChange}
             style={{ padding: '0.6rem 1rem 0.6rem 2.5rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', width: '300px' }}
@@ -238,7 +238,7 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
             ) : (
               currentData.map(order => {
                 const isProcessing = loadingAction === order.id;
-                
+
                 return (
                   <tr key={order.id}>
                     <td className={styles.mono} style={{ fontWeight: 600 }}>
@@ -260,10 +260,10 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
                     <td>
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
                         <span className={`${styles.statusBadge} ${styles[order.status.toLowerCase()] || ''}`}>
-                          {order.status === 'APPROVED' ? <CheckCircle size={14}/> : 
-                           order.status === 'PURCHASED' ? <ShoppingCart size={14}/> : 
-                           order.status === 'DELIVERED' ? <PackageCheck size={14}/> : 
-                           order.status === 'PENDING' ? <Clock size={14}/> : <XCircle size={14}/>}
+                          {order.status === 'APPROVED' ? <CheckCircle size={14} /> :
+                            order.status === 'PURCHASED' ? <ShoppingCart size={14} /> :
+                              order.status === 'DELIVERED' ? <PackageCheck size={14} /> :
+                                order.status === 'PENDING' ? <Clock size={14} /> : <XCircle size={14} />}
                           {order.status}
                         </span>
                         {order.status !== 'PENDING' && order.updatedAt && (
@@ -280,15 +280,15 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
                                 {details.deliveryDate && <div>Ent: {formatDate(details.deliveryDate)}</div>}
                               </div>
                             );
-                          } catch(e) { return null; }
+                          } catch (e) { return null; }
                         })()}
                       </div>
                     </td>
                     <td className={styles.dateCell}>{formatDate(order.createdAt)}</td>
                     <td>
                       <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                        <button 
-                          className={styles.actionBtn} 
+                        <button
+                          className={styles.actionBtn}
                           onClick={() => openModal(order)}
                           style={{ padding: '0.4rem 0.6rem' }}
                           title="Ver Detalles"
@@ -297,9 +297,9 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
                         </button>
 
                         {(order.paymentMethod === 'SINPE' || order.paymentMethod === 'TRANSFERENCIA') && (
-                          <a 
+                          <a
                             href={`https://wa.me/${formatPhoneForWA(order.customerPhone)}?text=${encodeURIComponent(getWhatsAppMessage(order))}`}
-                            target="_blank" 
+                            target="_blank"
                             rel="noopener noreferrer"
                             className={styles.actionBtn}
                             style={{ backgroundColor: '#25D366', color: 'white', border: 'none', padding: '0.4rem 0.6rem' }}
@@ -310,8 +310,8 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
                         )}
 
                         {order.status === 'PENDING' && (order.paymentMethod === 'SINPE' || order.paymentMethod === 'TRANSFERENCIA') && (
-                          <button 
-                            className={styles.actionBtn} 
+                          <button
+                            className={styles.actionBtn}
                             onClick={() => handleApprove(order)}
                             disabled={isProcessing}
                             style={{ backgroundColor: '#10b981', color: 'white', border: 'none' }}
@@ -321,8 +321,8 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
                         )}
 
                         {order.status === 'PENDING' && order.paymentMethod === 'TARJETA' && (
-                          <button 
-                            className={styles.actionBtn} 
+                          <button
+                            className={styles.actionBtn}
                             onClick={() => handleSyncTilopay(order.id)}
                             disabled={isProcessing}
                             style={{ backgroundColor: '#3b82f6', color: 'white', border: 'none', padding: '0.4rem 0.6rem' }}
@@ -333,8 +333,8 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
                         )}
 
                         {order.status === 'APPROVED' && userRole === 'MASTER_ADMIN' && (
-                          <button 
-                            className={styles.actionBtn} 
+                          <button
+                            className={styles.actionBtn}
                             onClick={() => handlePurchased(order)}
                             disabled={isProcessing}
                             style={{ backgroundColor: '#8b5cf6', color: 'white', border: 'none' }}
@@ -345,8 +345,8 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
                         )}
 
                         {(order.status === 'APPROVED' || order.status === 'PURCHASED') && (
-                          <button 
-                            className={styles.actionBtn} 
+                          <button
+                            className={styles.actionBtn}
                             onClick={() => handleDeliver(order)}
                             disabled={isProcessing}
                             style={{ backgroundColor: '#f59e0b', color: 'white', border: 'none' }}
@@ -362,24 +362,24 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
             )}
           </tbody>
         </table>
-        
+
         {totalPages > 1 && (
           <div className={styles.pagination}>
             <div className={styles.paginationInfo}>
               Mostrando {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, filteredOrders.length)} de {filteredOrders.length} órdenes
             </div>
             <div className={styles.paginationControls}>
-              <button 
-                className={styles.pageBtn} 
+              <button
+                className={styles.pageBtn}
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
               >
                 <ChevronLeft size={16} />
               </button>
-              
+
               {[...Array(totalPages)].map((_, i) => (
-                <button 
-                  key={i} 
+                <button
+                  key={i}
                   className={`${styles.pageBtn} ${currentPage === i + 1 ? styles.active : ''}`}
                   onClick={() => setCurrentPage(i + 1)}
                 >
@@ -387,8 +387,8 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
                 </button>
               ))}
 
-              <button 
-                className={styles.pageBtn} 
+              <button
+                className={styles.pageBtn}
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
               >
@@ -406,7 +406,7 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
               <h2>Detalles de Orden</h2>
               <button onClick={closeModal} className={styles.closeBtn}><X size={24} /></button>
             </div>
-            
+
             <div className={styles.modalBody}>
               <div className={styles.modalSection}>
                 <h3>Información General</h3>
@@ -425,7 +425,7 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
                         <p style={{ margin: '0' }}><strong>Entrega Estimada:</strong> {details.deliveryDate}</p>
                       </div>
                     );
-                  } catch(e) {
+                  } catch (e) {
                     return <p><strong>Detalles Proveedor:</strong> {selectedOrder.supplierDetails}</p>;
                   }
                 })()}
@@ -442,7 +442,7 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
               <div className={styles.modalSection}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                   <h3 style={{ margin: 0 }}>Items Comprados</h3>
-                  <button 
+                  <button
                     onClick={copyAllSkus}
                     style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', padding: '6px 12px', borderRadius: '6px', color: 'var(--text-primary)', cursor: 'pointer', fontSize: '0.85rem' }}
                   >
@@ -484,7 +484,7 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
                           const items = JSON.parse(selectedOrder.itemsList);
                           const subtotal = items.reduce((acc, item) => acc + (item.price * item.qty), 0);
                           return `₡${(subtotal * (adminConfig?.exchangeRate || 515)).toLocaleString('es-CR', { maximumFractionDigits: 0 })}`;
-                        } catch(e) { return '-'; }
+                        } catch (e) { return '-'; }
                       })()}
                     </span>
                   </div>
@@ -497,7 +497,7 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
                           const subtotal = items.reduce((acc, item) => acc + (item.price * item.qty), 0);
                           const taxes = subtotal * 0.13;
                           return `₡${(taxes * (adminConfig?.exchangeRate || 515)).toLocaleString('es-CR', { maximumFractionDigits: 0 })}`;
-                        } catch(e) { return '-'; }
+                        } catch (e) { return '-'; }
                       })()}
                     </span>
                   </div>
@@ -511,7 +511,7 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
                           const taxes = subtotal * 0.13;
                           const shipping = selectedOrder.totalAmount - subtotal - taxes;
                           return `₡${(Math.max(0, shipping) * (adminConfig?.exchangeRate || 515)).toLocaleString('es-CR', { maximumFractionDigits: 0 })}`;
-                        } catch(e) { return '-'; }
+                        } catch (e) { return '-'; }
                       })()}
                     </span>
                   </div>
@@ -543,42 +543,42 @@ export default function OrdersTableClient({ initialOrders, adminConfig, userRole
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <div>
                   <label style={{ fontSize: '0.9rem', fontWeight: 500, display: 'block', marginBottom: '0.4rem', color: 'var(--text-secondary)' }}>Order ID (Partzilla)</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     placeholder="Ej. 12345678"
-                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: '1rem', outline: 'none' }} 
-                    value={purchasedForm.partzillaOrderId} 
-                    onChange={e => setPurchasedForm({...purchasedForm, partzillaOrderId: e.target.value})} 
+                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: '1rem', outline: 'none' }}
+                    value={purchasedForm.partzillaOrderId}
+                    onChange={e => setPurchasedForm({ ...purchasedForm, partzillaOrderId: e.target.value })}
                   />
                 </div>
                 <div>
                   <label style={{ fontSize: '0.9rem', fontWeight: 500, display: 'block', marginBottom: '0.4rem', color: 'var(--text-secondary)' }}>Total (Partzilla USD)</label>
-                  <input 
-                    type="number" 
-                    step="0.01" 
+                  <input
+                    type="number"
+                    step="0.01"
                     placeholder="Ej. 125.50"
-                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: '1rem', outline: 'none' }} 
-                    value={purchasedForm.partzillaTotal} 
-                    onChange={e => setPurchasedForm({...purchasedForm, partzillaTotal: e.target.value})} 
+                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: '1rem', outline: 'none' }}
+                    value={purchasedForm.partzillaTotal}
+                    onChange={e => setPurchasedForm({ ...purchasedForm, partzillaTotal: e.target.value })}
                   />
                 </div>
                 <div>
                   <label style={{ fontSize: '0.9rem', fontWeight: 500, display: 'block', marginBottom: '0.4rem', color: 'var(--text-secondary)' }}>Fecha Estimada de Entrega</label>
-                  <input 
-                    type="date" 
-                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: '1rem', outline: 'none' }} 
-                    value={purchasedForm.partzillaDeliveryDate} 
-                    onChange={e => setPurchasedForm({...purchasedForm, partzillaDeliveryDate: e.target.value})} 
+                  <input
+                    type="date"
+                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: '1rem', outline: 'none' }}
+                    value={purchasedForm.partzillaDeliveryDate}
+                    onChange={e => setPurchasedForm({ ...purchasedForm, partzillaDeliveryDate: e.target.value })}
                   />
                 </div>
                 <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '1rem', borderTop: '1px solid var(--border-color)', paddingTop: '1.5rem' }}>
-                  <button 
+                  <button
                     onClick={() => setPurchasedModal(null)}
                     style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-tertiary)', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 500 }}
                   >
                     Cancelar
                   </button>
-                  <button 
+                  <button
                     onClick={submitPurchased}
                     disabled={loadingAction === purchasedModal.id}
                     style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', border: 'none', background: 'var(--accent-red)', color: 'white', cursor: 'pointer', fontWeight: 500, opacity: loadingAction === purchasedModal.id ? 0.7 : 1 }}

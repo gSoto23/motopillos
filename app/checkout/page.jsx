@@ -87,7 +87,7 @@ export default function CheckoutPage() {
           if (data.user.address) {
             try {
               parsedAddress = JSON.parse(data.user.address);
-            } catch(e) {
+            } catch (e) {
               parsedAddress.exacta = data.user.address;
             }
           }
@@ -112,7 +112,7 @@ export default function CheckoutPage() {
           }
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const [selectedProv, setSelectedProv] = useState('');
@@ -302,7 +302,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className={styles.inputGroup}>
                   <label>Celular</label>
-                  <input required type="tel" placeholder="8888-8888" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} />
+                  <input required type="tel" placeholder="7097-3376" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} />
                 </div>
 
               </div>

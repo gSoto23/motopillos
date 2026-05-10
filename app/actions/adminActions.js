@@ -7,19 +7,19 @@ export async function getAdminConfig() {
     let config = await prisma.appConfiguration.findFirst({
       where: { key: 'GLOBAL_CONFIG' }
     });
-    
+
     // Seed default config if empty
     if (!config) {
       config = await prisma.appConfiguration.create({
         data: {
           key: 'GLOBAL_CONFIG',
           marginMultiplier: 1.25,
-          baseShippingCost: 15.00,
-          exchangeRate: 515.0,
-          sinpePhone: '8888-8888',
+          baseShippingCost: 20.00,
+          exchangeRate: 500.0,
+          sinpePhone: '7097-3376',
           sinpeName: 'Motopillos',
-          transferAccount: 'CR12015201001234567890',
-          transferName: 'Motopillos S.A.'
+          transferAccount: 'CR66010200009691875099',
+          transferName: 'Eddyn Gerardo Soto Arguedas'
         }
       });
     }
