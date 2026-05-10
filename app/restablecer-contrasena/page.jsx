@@ -1,10 +1,10 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { Lock, Loader2, CheckCircle, XCircle } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function RestablecerContrasenaPage() {
+function RestablecerContrasenaForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
@@ -169,5 +169,17 @@ export default function RestablecerContrasenaPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function RestablecerContrasenaPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Loader2 size={32} style={{ animation: 'spin 1s linear infinite', color: 'var(--accent-red)' }} />
+      </div>
+    }>
+      <RestablecerContrasenaForm />
+    </Suspense>
   );
 }
