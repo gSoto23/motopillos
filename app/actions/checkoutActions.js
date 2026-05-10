@@ -2,10 +2,10 @@
 import { prisma } from '@/lib/prisma';
 import { sendOrderConfirmationEmail, sendWelcomeEmail, sendAdminNewOrderEmail } from '@/lib/email';
 import bcrypt from 'bcryptjs';
-import { exec } from 'child_process';
+import { execFile } from 'child_process';
 import util from 'util';
 
-const execPromise = util.promisify(exec);
+const execFilePromise = util.promisify(execFile);
 
 function generateRandomPassword(length = 8) {
   const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -65,10 +65,8 @@ export async function verifyCartInventory(cartItems) {
       };
     }
 
-    // Escape JSON string for bash command line
-    const jsonSkus = JSON.stringify(skusData).replace(/'/g, "'\\''");
-    
-    const { stdout } = await execPromise(`${pythonPath} scraper/verify_cart_bulk.py '${jsonSkus}'`);
+    // Use execFile to prevent command injection
+    const { stdout } = await execFilePromise(pythonPath, ['scraper/verify_cart_bulk.py', JSON.stringify(skusData)]);
     const response = JSON.parse(stdout);
     
     if (response.success && response.results) {
@@ -132,8 +130,8 @@ export async function createOrder(orderData) {
           role: 'USER'
         }
       });
-      // Enviar email de bienvenida de forma asíncrona
-      sendWelcomeEmail(user, newPassword).catch(err => console.error("Welcome email error:", err));
+      // Enviar email de bienvenida
+      await sendWelcomeEmail(user, newPassword).catch(err => console.error("Welcome email error:", err));
     }
 
     const order = await prisma.order.create({
@@ -150,14 +148,14 @@ export async function createOrder(orderData) {
       }
     });
 
-    // Send confirmation email asynchronously only for offline methods
+    // Send confirmation email only for offline methods
     // For TARJETA, the email is sent from the webhook upon successful payment
     if (paymentMethod !== 'TARJETA') {
-      sendOrderConfirmationEmail(order).catch(err => console.error("Email error:", err));
+      await sendOrderConfirmationEmail(order).catch(err => console.error("Email error:", err));
     }
 
     // Send admin notification
-    sendAdminNewOrderEmail(order).catch(err => console.error("Admin Email error:", err));
+    await sendAdminNewOrderEmail(order).catch(err => console.error("Admin Email error:", err));
 
     return { success: true, orderId: order.id };
   } catch (error) {

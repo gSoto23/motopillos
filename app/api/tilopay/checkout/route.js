@@ -23,9 +23,11 @@ export async function POST(req) {
     const token = loginData.access_token || loginData.token;
     
     if (!token) throw new Error("Tilopay token not received");
-    const baseUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://motopillos.com' // Replace with actual production URL
-      : 'http://localhost:3000';
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL 
+      ? process.env.NEXT_PUBLIC_BASE_URL
+      : process.env.NODE_ENV === 'production' 
+        ? 'https://motopillos.com' 
+        : 'http://localhost:3000';
 
     const nameParts = customerName.trim().split(' ');
     const firstName = nameParts[0];
