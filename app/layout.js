@@ -35,7 +35,7 @@ export const metadata = {
     siteName: "Motopillos",
     images: [
       {
-        url: "/logo.png",
+        url: "/logobk.jpeg",
         width: 800,
         height: 600,
         alt: "Motopillos Logo",
@@ -48,7 +48,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "Motopillos | Repuestos Originales",
     description: "Encuentra repuestos originales OEM para tu moto.",
-    images: ["/logo.png"],
+    images: ["/logobk.jpeg"],
   },
   robots: {
     index: true,
